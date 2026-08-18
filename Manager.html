@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت دوره‌ها</title>
+    <style>
+        /* استایل‌ها مشابه قبل */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Vazir', 'Tahoma', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0e6d3 0%, #e8d5c4 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-size: 28px;
+            border-bottom: 3px solid #d69e2e;
+            padding-bottom: 15px;
+        }
+        .header-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #4a5568;
+        }
+        .server-status .indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .server-status .indicator.online {
+            background: #48bb78;
+            box-shadow: 0 0 10px rgba(72, 187, 120, 0.5);
+        }
+        .server-status .indicator.offline {
+            background: #e53e3e;
+            box-shadow: 0 0 10px rgba(229, 62, 62, 0.5);
+        }
+        .server-status .indicator.checking {
+            background: #d69e2e;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .server-status .status-text {
+            font-weight: 500;
+        }
+        .server-status .status-text.online {
+            color: #2f855a;
+        }
+        .server-status .status-text.offline {
+            color: #c53030;
+        }
+        .server-status .status-text.checking {
+            color: #b7791f;
+        }
+        .form-section {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+        .form-section h2 {
+            color: #2c5282;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-right: 10px;
+            border-right: 4px solid #d69e2e;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-group label .optional {
+            font-weight: 400;
+            color: #a0aec0;
+            font-size: 12px;
+        }
+        .form-group label .required-star {
+            color: #e53e3e;
+            margin-right: 2px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #d69e2e;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(214, 158, 46, 0.2);
+        }
+        .form-group input.invalid {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+        }
+        .form-group input.valid {
+            border-color: #38a169;
+            box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.2);
+        }
+        .form-group .validation-hint {
+            font-size: 12px;
+            margin-top: 4px;
+            color: #718096;
+        }
+        .form-group .validation-hint.error {
+            color: #e53e3e;
+        }
+        .form-group .validation-hint.success {
+            color: #38a169;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: #d69e2e;
+        }
+        .btn-primary:hover {
+            background: #b7791f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(214, 158, 46, 0.4);
+        }
+        .btn-success {
+            background: #38a169;
+        }
+        .btn-success:hover {
+            background: #2f855a;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #e53e3e;
+        }
+        .btn-danger:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: #718096;
+        }
+        .btn-secondary:hover {
+            background: #4a5568;
+            transform: translateY(-2px);
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            font-weight: 500;
+        }
+        .status-message.success {
+            display: block;
+            background: #f0fff4;
+            border: 2px solid #38a169;
+            color: #2d6a4f;
+        }
+        .status-message.error {
+            display: block;
+            background: #fff5f5;
+            border: 2px solid #e53e3e;
+            color: #9b2c2c;
+        }
+        .status-message.info {
+            display: block;
+            background: #ebf8ff;
+            border: 2px solid #3182ce;
+            color: #2a4365;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #d69e2e;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .course-list {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f7fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .course-list .empty-message {
+            color: #718096;
+            text-align: center;
+            padding: 30px;
+            font-size: 16px;
+        }
+        .course-item {
+            padding: 12px 15px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 8px;
+            border-right: 3px solid #d69e2e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .course-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .course-item .info {
+            flex: 1;
+            min-width: 200px;
+        }
+        .course-item .info strong {
+            color: #2d3748;
+            font-size: 16px;
+        }
+        .course-item .info .details {
+            color: #718096;
+            font-size: 13px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .course-item .info .details span {
+            margin-left: 12px;
+        }
+        .course-item .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .course-item .actions button {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+        }
+        .course-item .actions .edit-btn {
+            background: #d69e2e;
+        }
+        .course-item .actions .edit-btn:hover {
+            background: #b7791f;
+        }
+        .course-item .actions .delete-btn {
+            background: #e53e3e;
+        }
+        .course-item .actions .delete-btn:hover {
+            background: #c53030;
+        }
+        .course-item .actions .students-btn {
+            background: #4a90d9;
+        }
+        .course-item .actions .students-btn:hover {
+            background: #357abd;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .badge-running {
+            background: #48bb78;
+            color: white;
+        }
+        .badge-finished {
+            background: #a0aec0;
+            color: white;
+        }
+        .badge-upcoming {
+            background: #ed8936;
+            color: white;
+        }
+        .participant-badge {
+            background: #ebf8ff;
+            color: #2b6cb0;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        .info-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f0f4ff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .info-row .item {
+            font-size: 13px;
+            color: #2d3748;
+        }
+        .info-row .item strong {
+            color: #4a5568;
+        }
+
+        .students-list {
+            margin-top: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .students-list .empty-message {
+            color: #718096;
+            text-align: center;
+            padding: 30px;
+            font-size: 15px;
+        }
+        .student-item {
+            padding: 10px 15px;
+            margin: 5px 0;
+            background: #f7fafc;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-right: 3px solid #a0aec0;
+            transition: all 0.2s;
+        }
+        .student-item:hover {
+            background: #edf2f7;
+        }
+        .student-item .info {
+            flex: 1;
+            min-width: 150px;
+        }
+        .student-item .info strong {
+            color: #2d3748;
+        }
+        .student-item .info .details {
+            color: #718096;
+            font-size: 13px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 3px;
+        }
+        .student-item .status-badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .student-item .status-badge.pending {
+            background: #fefcbf;
+            color: #744210;
+        }
+        .student-item .status-badge.approved {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        .student-item .status-badge.rejected {
+            background: #fed7d7;
+            color: #9b2c2c;
+        }
+        .student-item .actions {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .student-item .actions button {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+        }
+        .student-item .actions .approve-btn {
+            background: #38a169;
+        }
+        .student-item .actions .approve-btn:hover {
+            background: #2f855a;
+        }
+        .student-item .actions .reject-btn {
+            background: #e53e3e;
+        }
+        .student-item .actions .reject-btn:hover {
+            background: #c53030;
+        }
+        .student-item .actions .pending-btn {
+            background: #d69e2e;
+        }
+        .student-item .actions .pending-btn:hover {
+            background: #b7791f;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .modal-close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: black;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-header h2 {
+            color: #2d3748;
+            font-size: 22px;
+        }
+        .modal-header .student-count {
+            font-size: 14px;
+            color: #718096;
+            background: #f7fafc;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .persian-date-input {
+            direction: ltr;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 15px;
+            }
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            .course-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .course-item .actions {
+                justify-content: center;
+                margin-top: 8px;
+            }
+            .student-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .student-item .actions {
+                justify-content: center;
+                margin-top: 8px;
+            }
+            .header-status {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            .modal-content {
+                margin: 10% auto;
+                padding: 15px;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 پنل مدیریت دوره‌های آموزشی</h1>
+        
+        <div class="header-status">
+            <div class="server-status">
+                <span class="indicator checking" id="serverIndicator"></span>
+                <span class="status-text checking" id="serverStatusText">در حال بررسی اتصال...</span>
+            </div>
+            <div style="font-size:13px; color:#a0aec0;">
+                <span id="lastUpdateTime">آخرین بروزرسانی: --</span>
+            </div>
+        </div>
+        
+        <div id="statusMessage" class="status-message"></div>
+        <div id="loadingIndicator" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top:10px;">در حال پردازش...</p>
+        </div>
+
+        <div class="form-section">
+            <h2>📚 ثبت / ویرایش دوره جدید</h2>
+            <form id="courseForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>عنوان دوره <span class="required-star">*</span></label>
+                        <input type="text" id="courseTitle" required placeholder="مثال: آموزش HTML و CSS">
+                    </div>
+                    <div class="form-group">
+                        <label>کد دوره <span class="required-star">*</span></label>
+                        <input type="text" id="courseCode" required placeholder="مثال: ۱۴۰۴۰۱۰۱">
+                        <div class="validation-hint" id="courseCodeHint">کد دوره الزامی است</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>نام آموزشگاه <span class="optional">(اختیاری)</span></label>
+                        <input type="text" id="institute" placeholder="اختیاری">
+                    </div>
+                    <div class="form-group">
+                        <label>مدرس دوره <span class="required-star">*</span></label>
+                        <input type="text" id="instructor" required placeholder="نام مدرس">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>وضعیت دوره <span class="required-star">*</span></label>
+                        <select id="courseStatus" required>
+                            <option value="">انتخاب کنید</option>
+                            <option value="در حال اجرا">در حال اجرا</option>
+                            <option value="خاتمه یافته">خاتمه یافته</option>
+                            <option value="در شرف شروع">در شرف شروع</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>محل تشکیل <span class="required-star">*</span></label>
+                        <input type="text" id="location" required placeholder="مثال: تهران">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>مدت زمان دوره (ساعت) <span class="required-star">*</span></label>
+                        <input type="number" id="duration" required min="1" placeholder="۲۰">
+                    </div>
+                    <div class="form-group">
+                        <label>تاریخ شروع <span class="required-star">*</span></label>
+                        <input type="text" id="startDate" class="persian-date-input" placeholder="مثال: ۱۴۰۴/۰۱/۱۵" required>
+                        <div class="validation-hint" id="startDateHint">فرمت: سال/ماه/روز (مثال: ۱۴۰۴/۰۱/۱۵)</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>تاریخ خاتمه <span class="required-star">*</span></label>
+                        <input type="text" id="endDate" class="persian-date-input" placeholder="مثال: ۱۴۰۴/۰۲/۲۰" required>
+                        <div class="validation-hint" id="endDateHint">فرمت: سال/ماه/روز (مثال: ۱۴۰۴/۰۲/۲۰)</div>
+                    </div>
+                </div>
+                <input type="hidden" id="editMode" value="false">
+                <input type="hidden" id="editCode" value="">
+                <div class="buttons">
+                    <button type="button" class="btn btn-primary" onclick="saveCourse()">💾 ذخیره دوره</button>
+                    <button type="reset" class="btn btn-danger" onclick="resetForm()">🔄 پاک کردن فرم</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="form-section">
+            <h2>📋 لیست دوره‌های تعریف شده</h2>
+            <div id="courseListContainer" class="course-list">
+                <div class="empty-message">⏳ در حال بارگذاری دوره‌ها...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="studentsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">📋 لیست دانشجویان</h2>
+                <span class="modal-close" onclick="closeStudentsModal()">&times;</span>
+            </div>
+            <div id="studentsListContainer" class="students-list">
+                <div class="empty-message">⏳ در حال بارگذاری...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // تنظیمات
+        // ============================================================
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz5WyHfsO3svJ-uXZAlxb_m2pww5CzoXOoPQR19zCePYGpXQ8w6b9nT4c9Edm9kVCs/exec';
+        
+        // ============================================================
+        // توابع تبدیل تاریخ - اصلاح شده برای تمام فرمت‌ها
+        // ============================================================
+        
+        // تبدیل تاریخ میلادی به شمسی
+        function toPersianDate(dateStr) {
+            if (!dateStr) return '';
+            
+            // 1. اگر تاریخ به صورت شمسی است، همان را برگردان
+            if (/^\d{4}\/\d{2}\/\d{2}$/.test(dateStr)) {
+                return dateStr;
+            }
+            
+            // 2. اگر تاریخ با خط تیره است و فرمت شمسی دارد (1405-06-01)
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                const year = parseInt(dateStr.split('-')[0]);
+                if (year >= 1300 && year <= 1450) {
+                    return dateStr.replace(/-/g, '/');
+                }
+            }
+            
+            // 3. اگر تاریخ به صورت "Sat May 16 1350 ..." است
+            // این فرمت مربوط به تاریخ‌های قدیمی جاوااسکریپت است
+            try {
+                // استخراج سال از رشته
+                const yearMatch = dateStr.match(/\d{4}/);
+                if (yearMatch) {
+                    const year = parseInt(yearMatch[0]);
+                    // اگر سال بین 1300 تا 1450 باشد، تاریخ شمسی است
+                    if (year >= 1300 && year <= 1450) {
+                        // استخراج ماه و روز از رشته
+                        const monthMatch = dateStr.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i);
+                        const dayMatch = dateStr.match(/\d{1,2}(?=\s)/);
+                        
+                        if (monthMatch && dayMatch) {
+                            const monthNames = {
+                                'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+                                'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+                            };
+                            const month = monthNames[monthMatch[0]];
+                            const day = parseInt(dayMatch[0]);
+                            if (month && day) {
+                                return `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+                            }
+                        }
+                        return dateStr;
+                    }
+                }
+            } catch (e) {
+                console.log('خطا در استخراج تاریخ از رشته:', e);
+            }
+            
+            // 4. تبدیل تاریخ میلادی به شمسی
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) {
+                    const match = dateStr.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+                    if (match) {
+                        const d = new Date(parseInt(match[1]), parseInt(match[2]) - 1, parseInt(match[3]));
+                        if (!isNaN(d.getTime())) {
+                            return convertGregorianToPersian(d);
+                        }
+                    }
+                    return dateStr;
+                }
+                
+                return convertGregorianToPersian(date);
+            } catch (e) {
+                console.error('خطا در تبدیل تاریخ به شمسی:', e);
+                return dateStr;
+            }
+        }
+
+        // تبدیل شی Date به تاریخ شمسی
+        function convertGregorianToPersian(date) {
+            const gy = date.getFullYear();
+            const gm = date.getMonth() + 1;
+            const gd = date.getDate();
+            
+            const result = gregorianToJalali(gy, gm, gd);
+            
+            if (!result) {
+                return `${gy}/${String(gm).padStart(2, '0')}/${String(gd).padStart(2, '0')}`;
+            }
+            
+            const year = String(result[0]);
+            const month = String(result[1]).padStart(2, '0');
+            const day = String(result[2]).padStart(2, '0');
+            
+            return `${year}/${month}/${day}`;
+        }
+
+        // الگوریتم تبدیل میلادی به شمسی
+        function gregorianToJalali(gy, gm, gd) {
+            try {
+                const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+                let gy2 = (gm > 2) ? (gy + 1) : gy;
+                let days = 355666 + (365 * gy) + Math.floor((gy2 + 3) / 4) - Math.floor((gy2 + 99) / 100) + Math.floor((gy2 + 399) / 400) + gd + g_d_m[gm - 1];
+                let jy = -1595 + (33 * Math.floor(days / 12053));
+                days %= 12053;
+                let jm = Math.floor(days / 31);
+                days %= 31;
+                if (jm > 6) {
+                    jm = 1 + Math.floor((days + 30) / 30);
+                    days = (days + 30) % 30;
+                } else {
+                    jm++;
+                }
+                return [jy, jm, days + 1];
+            } catch (e) {
+                console.error('خطا در gregorianToJalali:', e);
+                return null;
+            }
+        }
+
+        // نمایش تاریخ شمسی با نام ماه - اصلاح شده
+        function toPersianDateFull(dateStr) {
+            if (!dateStr) return '';
+            
+            try {
+                // ابتدا تاریخ را به فرمت استاندارد تبدیل کن
+                const normalized = toPersianDate(dateStr);
+                
+                if (!normalized || normalized === dateStr) {
+                    // اگر نتوانستیم تبدیل کنیم، خود رشته را برگردان
+                    return dateStr;
+                }
+                
+                const parts = normalized.split('/');
+                if (parts.length !== 3) return normalized;
+                
+                const year = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                const day = parseInt(parts[2]);
+                
+                if (isNaN(year) || isNaN(month) || isNaN(day)) return normalized;
+                
+                // بررسی اینکه تاریخ شمسی معتبر است
+                if (year < 1300 || year > 1450) return normalized;
+                
+                const monthNames = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 
+                                   'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+                
+                return `${day} ${monthNames[month - 1]} ${year}`;
+            } catch (e) {
+                console.error('خطا در toPersianDateFull:', e);
+                return dateStr;
+            }
+        }
+
+        // نمایش تاریخ به فرمت استاندارد با اسلش
+        function toPersianDateDisplay(dateStr) {
+            if (!dateStr) return '';
+            const result = toPersianDate(dateStr);
+            return result || dateStr;
+        }
+
+        // ============================================================
+        // توابع کمکی برای تاریخ شمسی
+        // ============================================================
+        
+        // تبدیل تاریخ شمسی به فرمت استاندارد با اسلش
+        function normalizePersianDate(dateStr) {
+            if (!dateStr) return '';
+            return dateStr.replace(/-/g, '/');
+        }
+
+        // اعتبارسنجی تاریخ شمسی
+        function validatePersianDate(dateStr) {
+            if (!dateStr) return false;
+            const normalized = normalizePersianDate(dateStr);
+            const pattern = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+            if (!pattern.test(normalized)) return false;
+            
+            const parts = normalized.split('/');
+            const year = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            const day = parseInt(parts[2]);
+            
+            if (year < 1300 || year > 1450) return false;
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+            
+            const daysInMonth = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+            if (day > daysInMonth[month - 1]) {
+                if (month === 12 && day === 30) {
+                    const leapYears = [1, 5, 9, 13, 17, 21, 25, 29];
+                    if (!leapYears.includes(year % 33)) return false;
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // ============================================================
+        // وضعیت اتصال به سرور
+        // ============================================================
+        function checkServerStatus() {
+            const indicator = document.getElementById('serverIndicator');
+            const statusText = document.getElementById('serverStatusText');
+            
+            indicator.className = 'indicator checking';
+            statusText.className = 'status-text checking';
+            statusText.textContent = 'در حال بررسی اتصال...';
+            
+            fetch(SCRIPT_URL + '?action=getCourses')
+                .then(response => {
+                    if (response.ok) {
+                        indicator.className = 'indicator online';
+                        statusText.className = 'status-text online';
+                        statusText.textContent = '✅ متصل به سرور';
+                        updateLastUpdateTime();
+                    } else {
+                        throw new Error('پاسخ ناموفق');
+                    }
+                })
+                .catch(() => {
+                    indicator.className = 'indicator offline';
+                    statusText.className = 'status-text offline';
+                    statusText.textContent = '❌ قطع اتصال به سرور';
+                });
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('lastUpdateTime').textContent = 'آخرین بروزرسانی: ' + timeStr;
+        }
+
+        // ============================================================
+        // توابع کمکی
+        // ============================================================
+        
+        function showMessage(message, type = 'info') {
+            const msgDiv = document.getElementById('statusMessage');
+            msgDiv.textContent = message;
+            msgDiv.className = 'status-message ' + type;
+            clearTimeout(msgDiv._timeout);
+            msgDiv._timeout = setTimeout(() => {
+                msgDiv.className = 'status-message';
+            }, 8000);
+        }
+        
+        function setLoading(show) {
+            document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('courseForm').reset();
+            document.getElementById('editMode').value = 'false';
+            document.getElementById('editCode').value = '';
+            document.querySelectorAll('.persian-date-input').forEach(el => {
+                el.className = 'persian-date-input';
+            });
+            document.querySelectorAll('.validation-hint').forEach(el => {
+                el.className = 'validation-hint';
+                if (el.id === 'startDateHint') el.textContent = 'فرمت: سال/ماه/روز (مثال: ۱۴۰۴/۰۱/۱۵)';
+                if (el.id === 'endDateHint') el.textContent = 'فرمت: سال/ماه/روز (مثال: ۱۴۰۴/۰۲/۲۰)';
+                if (el.id === 'courseCodeHint') el.textContent = 'کد دوره الزامی است';
+            });
+        }
+
+        // ============================================================
+        // بارگذاری دوره‌ها
+        // ============================================================
+        function loadCourses() {
+            setLoading(true);
+            
+            fetch(SCRIPT_URL + '?action=getCourses')
+                .then(response => {
+                    if (!response.ok) throw new Error('خطا در ارتباط با سرور');
+                    return response.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    console.log('📥 پاسخ دوره‌ها:', data);
+                    
+                    if (data.status === 'success') {
+                        const courses = data.courses || data.data || [];
+                        displayCourses(courses);
+                        updateLastUpdateTime();
+                        document.getElementById('serverIndicator').className = 'indicator online';
+                        document.getElementById('serverStatusText').className = 'status-text online';
+                        document.getElementById('serverStatusText').textContent = '✅ متصل به سرور';
+                    } else {
+                        showMessage('خطا در بارگذاری دوره‌ها: ' + (data.message || 'خطای ناشناخته'), 'error');
+                        displayCourses([]);
+                    }
+                })
+                .catch(error => {
+                    setLoading(false);
+                    showMessage('❌ خطا در بارگذاری دوره‌ها: ' + error.message, 'error');
+                    displayCourses([]);
+                    document.getElementById('serverIndicator').className = 'indicator offline';
+                    document.getElementById('serverStatusText').className = 'status-text offline';
+                    document.getElementById('serverStatusText').textContent = '❌ قطع اتصال به سرور';
+                });
+        }
+
+        function displayCourses(courses) {
+            const container = document.getElementById('courseListContainer');
+            if (!courses || courses.length === 0) {
+                container.innerHTML = '<div class="empty-message">📭 هیچ دوره‌ای تعریف نشده است.</div>';
+                return;
+            }
+
+            let html = '';
+            courses.forEach((course, index) => {
+                const codeValue = course.code !== undefined && course.code !== null ? String(course.code).trim() : '';
+                const titleValue = course.title !== undefined && course.title !== null ? String(course.title).trim() : '';
+                
+                let courseId = codeValue || titleValue || ('course-' + index);
+                
+                const statusClass = {
+                    'در حال اجرا': 'badge-running',
+                    'در شرف شروع': 'badge-upcoming',
+                    'خاتمه یافته': 'badge-finished'
+                }[course.status] || 'badge-finished';
+
+                const participants = course.participants || 0;
+                
+                const startDateDisplay = toPersianDateDisplay(course.startDate);
+                const endDateDisplay = toPersianDateDisplay(course.endDate);
+                const startDateFull = toPersianDateFull(course.startDate);
+                const endDateFull = toPersianDateFull(course.endDate);
+
+                html += `
+                    <div class="course-item" data-code="${courseId}">
+                        <div class="info">
+                            <strong>${titleValue}</strong>
+                            <span class="badge ${statusClass}">${course.status}</span>
+                            <span class="participant-badge">👥 ${participants} شرکت‌کننده</span>
+                            <div class="details">
+                                <span>🏫 ${course.institute || 'نامشخص'}</span>
+                                <span>👨‍🏫 ${course.instructor}</span>
+                                <span>📅 ${startDateFull} - ${endDateFull}</span>
+                                <span>⏱ ${course.duration} ساعت</span>
+                                ${codeValue ? `<span>📌 کد: ${codeValue}</span>` : ''}
+                            </div>
+                            <div class="info-row">
+                                <span class="item"><strong>محل:</strong> ${course.location}</span>
+                                <span class="item"><strong>تاریخ شروع:</strong> ${startDateDisplay}</span>
+                                <span class="item"><strong>تاریخ خاتمه:</strong> ${endDateDisplay}</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="students-btn" onclick="showStudents('${courseId}')">👥 دانشجویان</button>
+                            <button class="edit-btn" onclick="editCourse('${courseId}')">✏️ ویرایش</button>
+                            <button class="delete-btn" onclick="deleteCourse('${courseId}')">🗑️ حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // مدیریت دانشجویان - با تاریخ شمسی
+        // ============================================================
+        function showStudents(courseCode) {
+            if (!courseCode) {
+                showMessage('❌ کد دوره نامعتبر است!', 'error');
+                return;
+            }
+            
+            courseCode = String(courseCode).trim();
+            
+            if (courseCode === 'undefined' || courseCode === '') {
+                showMessage('❌ کد دوره نامعتبر است!', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('studentsModal');
+            const container = document.getElementById('studentsListContainer');
+            const title = document.getElementById('modalTitle');
+            
+            title.textContent = '📋 لیست دانشجویان - کد دوره: ' + courseCode;
+            container.innerHTML = '<div class="empty-message">⏳ در حال بارگذاری...</div>';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+
+            setLoading(true);
+
+            const url = SCRIPT_URL + '?action=getStudents&courseCode=' + encodeURIComponent(courseCode);
+            console.log('📤 ارسال درخواست به:', url);
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('خطا در ارتباط با سرور (کد: ' + response.status + ')');
+                    return response.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    console.log('📥 پاسخ کامل از سرور:', JSON.stringify(data, null, 2));
+                    
+                    if (data.status === 'success') {
+                        let studentsData = [];
+                        
+                        if (data.students && Array.isArray(data.students)) {
+                            studentsData = data.students;
+                        } else if (data.courses && Array.isArray(data.courses)) {
+                            studentsData = data.courses;
+                        } else if (data.data && Array.isArray(data.data)) {
+                            studentsData = data.data;
+                        } else if (Array.isArray(data)) {
+                            studentsData = data;
+                        }
+                        
+                        console.log('📋 داده‌های استخراج شده:', studentsData);
+                        
+                        if (studentsData.length === 0) {
+                            container.innerHTML = `
+                                <div class="empty-message">📭 هیچ دانشجویی برای کد دوره "${courseCode}" ثبت‌نام نکرده است.</div>
+                                <div style="text-align:center; margin-top:10px; color:#a0aec0; font-size:13px;">
+                                    💡 برای ثبت دانشجو، از فرم ثبت‌نام دانشجویی استفاده کنید.
+                                </div>
+                            `;
+                        } else {
+                            displayStudents(studentsData, courseCode);
+                        }
+                    } else {
+                        container.innerHTML = '<div class="empty-message" style="color:#e53e3e;">❌ ' + (data.message || 'خطا در بارگذاری') + '</div>';
+                        showMessage('❌ خطا: ' + (data.message || 'خطای ناشناخته'), 'error');
+                    }
+                })
+                .catch(error => {
+                    setLoading(false);
+                    container.innerHTML = '<div class="empty-message" style="color:#e53e3e;">❌ خطا در بارگذاری: ' + error.message + '</div>';
+                    showMessage('❌ خطا در ارتباط با سرور: ' + error.message, 'error');
+                    console.error('❌ Error:', error);
+                });
+        }
+
+        function displayStudents(students, courseCode) {
+            const container = document.getElementById('studentsListContainer');
+            
+            console.log('📋 نمایش دانشجویان:', students);
+            
+            if (!students || !Array.isArray(students) || students.length === 0) {
+                container.innerHTML = `<div class="empty-message">📭 هیچ دانشجویی برای کد دوره "${courseCode}" ثبت‌نام نکرده است.</div>`;
+                return;
+            }
+
+            let html = '';
+            students.forEach((student, index) => {
+                const firstName = student.firstName || student.firstname || student.name || '';
+                const lastName = student.lastName || student.lastname || student.family || '';
+                const nationalId = student.nationalId || student.nationalid || student.id || '-';
+                const phone = student.phone || student.mobile || '-';
+                const education = student.education || student.edu || '-';
+                // ✅ تبدیل تاریخ تولد با تابع اصلاح شده
+                const birthDateRaw = student.birthDate || student.birthdate || student.birth || '-';
+                const birthDate = toPersianDateFull(birthDateRaw);
+                const status = student.status || 'pending';
+                
+                const statusClass = {
+                    'pending': 'pending',
+                    'approved': 'approved',
+                    'rejected': 'rejected'
+                }[status] || 'pending';
+
+                const statusText = {
+                    'pending': 'در انتظار تایید',
+                    'approved': '✅ تایید شده',
+                    'rejected': '❌ رد شده'
+                }[status] || 'در انتظار تایید';
+
+                html += `
+                    <div class="student-item">
+                        <div class="info">
+                            <strong>${index + 1}. ${firstName} ${lastName}</strong>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <div class="details">
+                                <span>🆔 کد ملی: ${nationalId}</span>
+                                <span>📱 ${phone}</span>
+                                <span>🎓 ${education}</span>
+                                <span>📅 ${birthDate}</span>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="approve-btn" onclick="updateStudentStatus('${nationalId}', '${courseCode}', 'approved')">✅ تایید</button>
+                            <button class="pending-btn" onclick="updateStudentStatus('${nationalId}', '${courseCode}', 'pending')">⏳ در انتظار</button>
+                            <button class="reject-btn" onclick="updateStudentStatus('${nationalId}', '${courseCode}', 'rejected')">❌ رد</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            
+            const headerTitle = document.getElementById('modalTitle');
+            headerTitle.textContent = `📋 لیست دانشجویان (${students.length} نفر) - کد دوره: ${courseCode}`;
+        }
+
+        function updateStudentStatus(nationalId, courseCode, status) {
+            if (!nationalId || !courseCode) {
+                showMessage('❌ اطلاعات دانشجو یا دوره کامل نیست!', 'error');
+                return;
+            }
+
+            const statusNames = {
+                'approved': 'تایید',
+                'rejected': 'رد',
+                'pending': 'در انتظار'
+            };
+            
+            if (!confirm(`آیا از تغییر وضعیت این دانشجو به "${statusNames[status]}" اطمینان دارید؟`)) {
+                return;
+            }
+
+            setLoading(true);
+
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'updateStudentStatus',
+                    nationalId: nationalId,
+                    courseCode: courseCode,
+                    status: status
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('خطا در ارتباط با سرور');
+                return response.json();
+            })
+            .then(result => {
+                setLoading(false);
+                if (result.status === 'success') {
+                    showMessage('✅ وضعیت دانشجو با موفقیت تغییر کرد!', 'success');
+                    showStudents(courseCode);
+                    loadCourses();
+                } else {
+                    showMessage('❌ ' + (result.message || 'خطا در تغییر وضعیت'), 'error');
+                }
+            })
+            .catch(error => {
+                setLoading(false);
+                showMessage('❌ خطا در تغییر وضعیت: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function closeStudentsModal() {
+            document.getElementById('studentsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('studentsModal');
+            if (event.target === modal) {
+                closeStudentsModal();
+            }
+        }
+
+        // ============================================================
+        // اعتبارسنجی کد دوره
+        // ============================================================
+        function validateCourseCode() {
+            const input = document.getElementById('courseCode');
+            const hint = document.getElementById('courseCodeHint');
+            const value = input.value.trim();
+            
+            if (value.length === 0) {
+                input.className = 'invalid';
+                hint.className = 'validation-hint error';
+                hint.textContent = '❌ کد دوره الزامی است';
+                return false;
+            }
+            
+            input.className = 'valid';
+            hint.className = 'validation-hint success';
+            hint.textContent = '✓ کد دوره معتبر است';
+            return true;
+        }
+
+        // ============================================================
+        // ذخیره دوره
+        // ============================================================
+        function getCourseFormData() {
+            return {
+                title: document.getElementById('courseTitle').value.trim(),
+                code: document.getElementById('courseCode').value.trim(),
+                institute: document.getElementById('institute').value.trim(),
+                instructor: document.getElementById('instructor').value.trim(),
+                status: document.getElementById('courseStatus').value,
+                location: document.getElementById('location').value.trim(),
+                duration: document.getElementById('duration').value,
+                startDate: normalizePersianDate(document.getElementById('startDate').value.trim()),
+                endDate: normalizePersianDate(document.getElementById('endDate').value.trim())
+            };
+        }
+
+        function validateCourseForm(data) {
+            const required = ['title', 'code', 'instructor', 'status', 'location', 'duration', 'startDate', 'endDate'];
+            
+            for (let field of required) {
+                if (!data[field]) {
+                    showMessage(`لطفاً فیلد ${getFieldLabel(field)} را پر کنید.`, 'error');
+                    return false;
+                }
+            }
+            
+            if (!validatePersianDate(data.startDate)) {
+                showMessage('تاریخ شروع نامعتبر است. فرمت: ۱۴۰۴/۰۱/۱۵', 'error');
+                return false;
+            }
+            
+            if (!validatePersianDate(data.endDate)) {
+                showMessage('تاریخ خاتمه نامعتبر است. فرمت: ۱۴۰۴/۰۱/۱۵', 'error');
+                return false;
+            }
+            
+            const startParts = normalizePersianDate(data.startDate).split('/').map(Number);
+            const endParts = normalizePersianDate(data.endDate).split('/').map(Number);
+            const startNum = startParts[0] * 10000 + startParts[1] * 100 + startParts[2];
+            const endNum = endParts[0] * 10000 + endParts[1] * 100 + endParts[2];
+            
+            if (startNum > endNum) {
+                showMessage('تاریخ شروع نباید بعد از تاریخ خاتمه باشد.', 'error');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function getFieldLabel(field) {
+            const labels = {
+                title: 'عنوان دوره',
+                code: 'کد دوره',
+                institute: 'نام آموزشگاه',
+                instructor: 'مدرس دوره',
+                status: 'وضعیت دوره',
+                location: 'محل تشکیل',
+                duration: 'مدت زمان دوره',
+                startDate: 'تاریخ شروع',
+                endDate: 'تاریخ خاتمه'
+            };
+            return labels[field] || field;
+        }
+
+        function validateDateInput(inputId, hintId) {
+            const input = document.getElementById(inputId);
+            const hint = document.getElementById(hintId);
+            const value = input.value.trim();
+            
+            if (value.length === 0) {
+                input.className = 'persian-date-input';
+                hint.className = 'validation-hint';
+                hint.textContent = 'فرمت: سال/ماه/روز (مثال: ۱۴۰۴/۰۱/۱۵)';
+                return false;
+            }
+            
+            if (validatePersianDate(value)) {
+                input.className = 'persian-date-input valid';
+                hint.className = 'validation-hint success';
+                hint.textContent = '✓ تاریخ معتبر است';
+                return true;
+            } else {
+                input.className = 'persian-date-input invalid';
+                hint.className = 'validation-hint error';
+                hint.textContent = '❌ تاریخ نامعتبر. فرمت: ۱۴۰۴/۰۱/۱۵';
+                return false;
+            }
+        }
+
+        function saveCourse() {
+            const data = getCourseFormData();
+            
+            if (!validateCourseForm(data)) {
+                return;
+            }
+            
+            const isEdit = document.getElementById('editMode').value === 'true';
+            const editCode = document.getElementById('editCode').value;
+            
+            const dataToSend = {
+                ...data
+            };
+            
+            console.log('📤 تاریخ شمسی ارسال به سرور:', dataToSend.startDate, dataToSend.endDate);
+            
+            setLoading(true);
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: isEdit ? 'updateCourse' : 'saveCourse',
+                    ...dataToSend,
+                    oldCode: editCode
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('خطا در ارتباط با سرور');
+                return response.json();
+            })
+            .then(result => {
+                setLoading(false);
+                if (result.status === 'success') {
+                    showMessage(isEdit ? '✅ دوره با موفقیت ویرایش شد!' : '✅ دوره با موفقیت ذخیره شد!', 'success');
+                    resetForm();
+                    loadCourses();
+                } else {
+                    showMessage('❌ ' + (result.message || 'خطا در ذخیره دوره'), 'error');
+                }
+            })
+            .catch(error => {
+                setLoading(false);
+                showMessage('❌ خطا در ذخیره دوره: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        // ============================================================
+        // ویرایش دوره
+        // ============================================================
+        function editCourse(courseCode) {
+            if (!courseCode) {
+                showMessage('❌ کد دوره نامعتبر است!', 'error');
+                return;
+            }
+
+            courseCode = String(courseCode).trim();
+
+            setLoading(true);
+            
+            const url = SCRIPT_URL + '?action=getCourseInfo&courseCode=' + encodeURIComponent(courseCode);
+            console.log('📤 ارسال درخواست ویرایش:', url);
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('خطا در ارتباط با سرور (کد: ' + response.status + ')');
+                    return response.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    console.log('📥 پاسخ ویرایش:', data);
+                    
+                    if (data.status === 'success' && data.course) {
+                        const course = data.course;
+                        document.getElementById('courseTitle').value = course.title || '';
+                        document.getElementById('courseCode').value = course.code || '';
+                        document.getElementById('institute').value = course.institute || '';
+                        document.getElementById('instructor').value = course.instructor || '';
+                        document.getElementById('courseStatus').value = course.status || '';
+                        document.getElementById('location').value = course.location || '';
+                        document.getElementById('duration').value = course.duration || '';
+                        document.getElementById('startDate').value = toPersianDateDisplay(course.startDate);
+                        document.getElementById('endDate').value = toPersianDateDisplay(course.endDate);
+                        
+                        document.getElementById('editMode').value = 'true';
+                        document.getElementById('editCode').value = course.code || course.title;
+                        
+                        document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+                        showMessage('✏️ در حال ویرایش دوره: ' + course.title, 'info');
+                    } else {
+                        showMessage('❌ خطا در دریافت اطلاعات دوره: ' + (data.message || 'دوره یافت نشد'), 'error');
+                    }
+                })
+                .catch(error => {
+                    setLoading(false);
+                    showMessage('❌ خطا در دریافت اطلاعات دوره: ' + error.message, 'error');
+                    console.error('❌ Error:', error);
+                });
+        }
+
+        // ============================================================
+        // حذف دوره
+        // ============================================================
+        function deleteCourse(courseCode) {
+            if (!courseCode) {
+                showMessage('❌ کد دوره نامعتبر است!', 'error');
+                return;
+            }
+
+            if (!confirm('⚠️ آیا از حذف این دوره اطمینان دارید؟\nاین عمل غیرقابل بازگشت است.')) {
+                return;
+            }
+            
+            setLoading(true);
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'deleteCourse',
+                    courseCode: courseCode
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('خطا در ارتباط با سرور');
+                return response.json();
+            })
+            .then(result => {
+                setLoading(false);
+                if (result.status === 'success') {
+                    showMessage('✅ دوره با موفقیت حذف شد!', 'success');
+                    loadCourses();
+                } else {
+                    showMessage('❌ ' + (result.message || 'خطا در حذف دوره'), 'error');
+                }
+            })
+            .catch(error => {
+                setLoading(false);
+                showMessage('❌ خطا در حذف دوره: ' + error.message, 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        // ============================================================
+        // بارگذاری اولیه
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            checkServerStatus();
+            loadCourses();
+            showMessage('👋 به پنل مدیریت خوش آمدید.', 'info');
+            
+            document.getElementById('startDate').addEventListener('input', function() {
+                validateDateInput('startDate', 'startDateHint');
+            });
+            document.getElementById('startDate').addEventListener('blur', function() {
+                validateDateInput('startDate', 'startDateHint');
+            });
+            
+            document.getElementById('endDate').addEventListener('input', function() {
+                validateDateInput('endDate', 'endDateHint');
+            });
+            document.getElementById('endDate').addEventListener('blur', function() {
+                validateDateInput('endDate', 'endDateHint');
+            });
+            
+            document.getElementById('courseCode').addEventListener('input', validateCourseCode);
+            document.getElementById('courseCode').addEventListener('blur', validateCourseCode);
+        });
+    </script>
+</body>
+</html>

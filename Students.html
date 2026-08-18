@@ -1,0 +1,2647 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سامانه ثبت‌نام و صدور گواهی دوره‌های آموزشی</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --primary-gradient: linear-gradient(135deg, #2563eb, #7c3aed);
+            --success: #16a34a;
+            --success-light: #dcfce7;
+            --success-dark: #15803d;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --danger-dark: #b91c1c;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg-body: #f0f4ff;
+            --bg-container: rgba(255, 255, 255, 0.95);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-container: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --gray-50: #1e293b;
+            --gray-100: #334155;
+            --gray-200: #475569;
+            --primary-light: #1e3a5f;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazir', 'Tahoma', 'Arial', sans-serif;
+            background: var(--bg-body);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: var(--bg-container);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .app-header h1 {
+            color: var(--text-primary);
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-header h1 .badge-version {
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 14px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: var(--gray-100);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary-light);
+            transform: rotate(20deg);
+        }
+
+        .last-update {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .status-dot.online {
+            background: var(--success);
+            box-shadow: 0 0 12px rgba(22, 163, 74, 0.4);
+        }
+
+        .status-dot.offline {
+            background: var(--danger);
+            box-shadow: 0 0 12px rgba(220, 38, 38, 0.4);
+            animation: pulse 1s infinite;
+        }
+
+        .status-dot.checking {
+            background: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .status-text.online { color: var(--success); }
+        .status-text.offline { color: var(--danger); }
+        .status-text.checking { color: var(--warning); }
+
+        .message {
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            margin: 12px 0;
+            display: none;
+            font-weight: 500;
+            animation: slideDown 0.3s ease;
+        }
+
+        .message.show { display: block; }
+        .message.success { background: var(--success-light); border: 2px solid var(--success); color: var(--success-dark); }
+        .message.error { background: var(--danger-light); border: 2px solid var(--danger); color: var(--danger-dark); }
+        .message.info { background: var(--primary-light); border: 2px solid var(--primary); color: var(--primary-dark); }
+        .message.warning { background: var(--warning-light); border: 2px solid var(--warning); color: #78350f; }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .loading.show { display: block; }
+
+        .spinner {
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60vh;
+        }
+
+        .login-screen.hidden { display: none; }
+
+        .login-box {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-container);
+            padding: 40px 35px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+
+        .login-box .login-icon {
+            text-align: center;
+            font-size: 52px;
+            margin-bottom: 8px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .login-box .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .login-box .form-group {
+            margin-bottom: 18px;
+        }
+
+        .login-box .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .login-box .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+            transition: var(--transition);
+            background: white;
+            color: var(--text-primary);
+        }
+
+        .login-box .form-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            padding: 12px;
+            background: var(--danger-light);
+            border-radius: var(--radius);
+            border: 1px solid var(--danger);
+        }
+
+        .login-error.show { display: block; }
+
+        .login-success {
+            color: var(--success);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            padding: 12px;
+            background: var(--success-light);
+            border-radius: var(--radius);
+            border: 1px solid var(--success);
+        }
+
+        .login-success.show { display: block; }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .login-footer a {
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-footer a:hover { text-decoration: underline; }
+
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+
+        .welcome-banner {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 18px 24px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .welcome-banner .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .welcome-banner .user-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .welcome-banner .user-status {
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .welcome-banner .user-status.approved {
+            background: var(--success);
+            color: white;
+        }
+
+        .welcome-banner .user-status.pending {
+            background: var(--warning);
+            color: white;
+        }
+
+        .welcome-banner .user-status.rejected {
+            background: var(--danger);
+            color: white;
+        }
+
+        .welcome-banner .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .welcome-banner .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .form-section {
+            background: var(--gray-50);
+            padding: 24px;
+            border-radius: var(--radius);
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .form-section .section-title {
+            color: var(--text-primary);
+            font-size: 20px;
+            margin-bottom: 16px;
+            padding-right: 12px;
+            border-right: 4px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .course-list {
+            margin: 12px 0;
+            padding: 8px;
+            background: var(--bg-container);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .course-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .course-list::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 10px;
+        }
+
+        .course-list::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 10px;
+        }
+
+        .course-item {
+            padding: 14px 18px;
+            margin: 6px 0;
+            background: var(--bg-container);
+            border-radius: var(--radius);
+            border-right: 4px solid var(--gray-300);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .course-item:hover {
+            background: var(--primary-light);
+            transform: translateX(-4px);
+        }
+
+        .course-item.selected {
+            background: var(--primary-light);
+            border-right-color: var(--primary);
+            font-weight: 500;
+        }
+
+        .course-item .course-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .course-item .course-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-running { background: var(--success); color: white; }
+        .badge-upcoming { background: var(--warning); color: white; }
+        .badge-finished { background: var(--gray-400); color: white; }
+        .badge-registered { background: var(--primary); color: white; }
+
+        .course-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .course-filters {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .registered-courses-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--success-light);
+            border-radius: var(--radius);
+            border: 2px solid var(--success);
+        }
+
+        .registered-courses-section .reg-title {
+            font-weight: 600;
+            color: var(--success-dark);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .registered-course-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--success);
+            margin: 4px 6px 4px 0;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .registered-course-chip .remove-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
+        }
+
+        .registered-course-chip .remove-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .selected-course-info {
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            margin-top: 12px;
+            display: none;
+            border-right: 4px solid var(--primary);
+        }
+
+        .selected-course-info.show { display: block; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-grid .full-width { grid-column: 1 / -1; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group label .optional {
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .form-group label .required { color: var(--danger); }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 14px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-family: inherit;
+            transition: var(--transition);
+            background: white;
+            width: 100%;
+            color: var(--text-primary);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .form-group input.valid {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
+        }
+
+        .form-group input.invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+        }
+
+        .form-group input:disabled,
+        .form-group input[readonly] {
+            background: var(--gray-100);
+            cursor: not-allowed;
+            color: var(--text-secondary);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            margin-top: 4px;
+            color: var(--text-secondary);
+        }
+
+        .form-group .hint.error { color: var(--danger); }
+        .form-group .hint.success { color: var(--success); }
+
+        .form-group input[type="file"] {
+            padding: 8px;
+            border: 2px dashed var(--gray-300);
+            background: var(--bg-container);
+            cursor: pointer;
+        }
+
+        .form-group input[type="file"]:hover {
+            border-color: var(--primary);
+        }
+
+        .photo-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-top: 8px;
+            display: none;
+        }
+
+        .photo-preview.show { display: block; }
+
+        .reg-status {
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            margin: 12px 0;
+            display: none;
+            font-weight: 500;
+        }
+
+        .reg-status.pending {
+            display: block;
+            background: var(--warning-light);
+            border: 2px solid var(--warning);
+            color: #78350f;
+        }
+
+        .reg-status.approved {
+            display: block;
+            background: var(--success-light);
+            border: 2px solid var(--success);
+            color: var(--success-dark);
+        }
+
+        .reg-status.rejected {
+            display: block;
+            background: var(--danger-light);
+            border: 2px solid var(--danger);
+            color: var(--danger-dark);
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary { background: var(--primary); }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+
+        .btn-success { background: var(--success); }
+        .btn-success:hover:not(:disabled) { background: var(--success-dark); }
+
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover:not(:disabled) { background: var(--danger-dark); }
+
+        .btn-secondary { background: var(--gray-500); }
+        .btn-secondary:hover:not(:disabled) { background: var(--gray-600); }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-container);
+            margin: 20px;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            width: 95%;
+            max-width: 850px;
+            max-height: 95vh;
+            overflow-y: auto;
+            animation: slideDown 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 22px;
+        }
+
+        .modal-close {
+            color: var(--gray-400);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            background: none;
+            border: none;
+            padding: 0 8px;
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .certificate-preview {
+            background: var(--bg-container);
+            padding: 30px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border-color);
+        }
+
+        .certificate-preview .cert-header {
+            text-align: center;
+            border-bottom: 3px solid var(--text-primary);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .certificate-preview .cert-header .logo {
+            max-width: 80px;
+            max-height: 80px;
+            margin-bottom: 8px;
+        }
+
+        .certificate-preview .cert-header .student-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .certificate-preview .cert-header h2 {
+            color: var(--text-primary);
+            font-size: 24px;
+        }
+
+        .certificate-preview .cert-body {
+            line-height: 2.2;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+
+        .certificate-preview .cert-body .student-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .certificate-preview .cert-body .cert-detail {
+            text-align: center;
+            margin: 4px 0;
+        }
+
+        .certificate-preview .cert-body .qr-section {
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .certificate-preview .cert-body .qr-section img {
+            max-width: 120px;
+            max-height: 120px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 6px;
+        }
+
+        .certificate-preview .cert-body .tracking-code {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .certificate-preview .cert-footer {
+            margin-top: 24px;
+            text-align: center;
+            border-top: 3px solid var(--text-primary);
+            padding-top: 20px;
+        }
+
+        .certificate-preview .cert-footer .signatures {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .certificate-preview .cert-footer .signatures .sig-item {
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .certificate-preview .cert-footer .signatures .sig-line {
+            border-top: 2px solid var(--text-primary);
+            width: 130px;
+            margin: 6px auto;
+        }
+
+        .certificate-preview .cert-footer .signatures .sig-img {
+            max-width: 120px;
+            max-height: 60px;
+            display: block;
+            margin: 0 auto 4px;
+        }
+
+        .certificate-preview .cert-footer .stamp-img {
+            max-width: 80px;
+            max-height: 80px;
+            display: block;
+            margin: 0 auto 8px;
+        }
+
+        .cert-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 16px; border-radius: var(--radius); }
+            .app-header h1 { font-size: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .login-box { padding: 24px 18px; }
+            .buttons { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; }
+            .course-item .course-info { flex-direction: column; align-items: stretch; }
+            .course-meta { font-size: 12px; }
+            .welcome-banner { flex-direction: column; text-align: center; }
+            .welcome-banner .user-info { justify-content: center; }
+            .status-bar { flex-direction: column; align-items: stretch; gap: 6px; }
+            .modal-content { margin: 10px; padding: 16px; max-height: 98vh; }
+            .certificate-preview { padding: 16px; }
+            .certificate-preview .cert-footer .signatures { flex-direction: column; gap: 16px; }
+            .certificate-preview .cert-body { font-size: 14px; line-height: 2; }
+            .certificate-preview .cert-body .student-name { font-size: 20px; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; margin: 0; }
+            .container { box-shadow: none; padding: 16px; border-radius: 0; background: white; }
+            .no-print { display: none !important; }
+            .certificate-preview { border: none; padding: 8px; }
+            .modal-content { margin: 0; padding: 0; max-height: 100vh; border-radius: 0; box-shadow: none; animation: none; }
+            .modal { background: white; position: static; animation: none; }
+            .modal-header { display: none !important; }
+            .cert-actions { display: none !important; }
+            .status-bar { display: none !important; }
+            .welcome-banner { display: none !important; }
+            .form-section { display: none !important; }
+            .course-list { display: none !important; }
+            .selected-course-info { display: none !important; }
+            .reg-status { display: none !important; }
+            .registered-courses-section { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="app-header">
+            <h1>
+                📋 سامانه ثبت‌نام
+                <span class="badge-version">v3.3</span>
+            </h1>
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" title="تغییر تم">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <span class="last-update" id="lastUpdateTime">آخرین بروزرسانی: --</span>
+            </div>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <i class="fas fa-globe"></i>
+                <span class="status-dot checking" id="internetDot"></span>
+                <span class="status-text checking" id="internetStatus">در حال بررسی...</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-server"></i>
+                <span class="status-dot checking" id="serverDot"></span>
+                <span class="status-text checking" id="serverStatus">در حال بررسی...</span>
+            </div>
+            <div class="status-item">
+                <i class="far fa-clock"></i>
+                <span id="lastUpdateTimeDisplay">--:--</span>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top:12px; color:var(--text-secondary);">در حال پردازش...</p>
+        </div>
+
+        <div id="loginScreen" class="login-screen">
+            <div class="login-box">
+                <div class="login-icon">🔐</div>
+                <h2>ورود به پنل دانشجویی</h2>
+                <p class="subtitle">برای مشاهده و مدیریت اطلاعات خود وارد شوید</p>
+
+                <div class="form-group">
+                    <label>کد ملی</label>
+                    <input type="text" id="loginNationalId" placeholder="۱۰ رقمی" dir="ltr" maxlength="10"
+                           oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                </div>
+
+                <div class="form-group">
+                    <label>رمز عبور</label>
+                    <input type="password" id="loginPassword" placeholder="رمز عبور خود را وارد کنید" dir="ltr">
+                </div>
+
+                <div id="loginError" class="login-error">❌ کد ملی یا رمز عبور اشتباه است</div>
+                <div id="loginSuccess" class="login-success">✅ ورود موفق</div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" onclick="handleLogin()">
+                        <i class="fas fa-sign-in-alt"></i> ورود
+                    </button>
+                </div>
+
+                <div class="login-footer">
+                    <span>ثبت‌نام نکرده‌اید؟ </span>
+                    <a onclick="showRegistrationForm()">ثبت‌نام جدید</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard" class="dashboard">
+            <div class="welcome-banner">
+                <div class="user-info">
+                    <span class="user-name" id="welcomeName">👤 </span>
+                    <span class="user-status" id="welcomeStatus"></span>
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-logout" onclick="handleLogout()">
+                        <i class="fas fa-sign-out-alt"></i> خروج
+                    </button>
+                </div>
+            </div>
+
+            <section class="form-section">
+                <h2 class="section-title"><i class="fas fa-book"></i> انتخاب دوره</h2>
+                <div id="courseList" class="course-list">
+                    <p style="color:var(--text-secondary); text-align:center;">در حال بارگذاری دوره‌ها...</p>
+                </div>
+
+                <div class="course-filters">
+                    <span><span class="badge badge-running">●</span> در حال اجرا</span>
+                    <span><span class="badge badge-upcoming">●</span> در شرف شروع</span>
+                    <span><span class="badge badge-finished">●</span> خاتمه یافته</span>
+                    <span><span class="badge badge-registered">✓</span> ثبت‌نام شده</span>
+                </div>
+
+                <div id="registeredCoursesContainer" class="registered-courses-section" style="display:none;">
+                    <div class="reg-title"><i class="fas fa-check-circle"></i> دوره‌های ثبت‌نام شده شما</div>
+                    <div id="registeredCoursesList"></div>
+                </div>
+
+                <div id="selectedCourseInfo" class="selected-course-info">
+                    <strong>دوره انتخاب شده:</strong> <span id="selectedCourseTitle"></span>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <h2 class="section-title"><i class="fas fa-user-graduate"></i> اطلاعات شخصی</h2>
+
+                <form id="studentForm" novalidate>
+                    <input type="hidden" id="editMode" value="false">
+                    <input type="hidden" id="editNationalId" value="">
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>نام <span class="required">*</span></label>
+                            <input type="text" id="firstName" required placeholder="مثال: علی">
+                        </div>
+
+                        <div class="form-group">
+                            <label>نام خانوادگی <span class="required">*</span></label>
+                            <input type="text" id="lastName" required placeholder="مثال: محمدی">
+                        </div>
+
+                        <div class="form-group">
+                            <label>جنسیت <span class="required">*</span></label>
+                            <select id="gender" required>
+                                <option value="">انتخاب کنید</option>
+                                <option value="مرد">مرد</option>
+                                <option value="زن">زن</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>تاریخ تولد <span class="required">*</span></label>
+                            <input type="text" id="birthDate" required placeholder="۱۳۷۵/۰۵/۱۵" dir="ltr">
+                            <span class="hint" id="birthDateHint">فرمت: سال/ماه/روز</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>کد ملی <span class="required">*</span></label>
+                            <input type="text" id="nationalId" required placeholder="۱۰ رقمی" dir="ltr" maxlength="10">
+                            <span class="hint" id="nationalIdHint">کد ملی ۱۰ رقم</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>شماره موبایل <span class="required">*</span></label>
+                            <input type="tel" id="phone" required placeholder="۰۹۱۲۳۴۵۶۷۸۹" dir="ltr" maxlength="11">
+                            <span class="hint" id="phoneHint">شروع با ۰۹</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>مدرک تحصیلی <span class="required">*</span></label>
+                            <select id="education" required>
+                                <option value="">انتخاب کنید</option>
+                                <option value="دیپلم">دیپلم</option>
+                                <option value="فوق دیپلم">فوق دیپلم</option>
+                                <option value="لیسانس">لیسانس</option>
+                                <option value="فوق لیسانس">فوق لیسانس</option>
+                                <option value="دکترا">دکترا</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>آدرس <span class="required">*</span></label>
+                            <input type="text" id="address" required placeholder="شهر، خیابان">
+                        </div>
+
+                        <div class="form-group">
+                            <label>رمز عبور <span class="optional">(برای ورود)</span></label>
+                            <input type="password" id="password" placeholder="حداقل ۴ کاراکتر" dir="ltr" minlength="4">
+                            <span class="hint" id="passwordHint">حداقل ۴ کاراکتر</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label>تصویر <span class="optional">(اختیاری)</span></label>
+                            <input type="file" id="studentPhoto" accept="image/*" onchange="handlePhotoUpload(this)">
+                            <span class="hint" id="photoHint">JPG, PNG (حداکثر ۲MB)</span>
+                            <img id="photoPreview" class="photo-preview" alt="پیش‌نمایش">
+                        </div>
+                    </div>
+
+                    <div id="regStatus" class="reg-status"></div>
+
+                    <div class="buttons">
+                        <button type="button" class="btn btn-success" id="printBtn" onclick="handlePrintCertificate()" disabled>
+                            <i class="fas fa-print"></i> چاپ گواهی
+                        </button>
+                        <button type="button" class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">
+                            <i class="fas fa-save"></i> ذخیره تغییرات
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="handleDeleteAccount()">
+                            <i class="fas fa-trash-alt"></i> حذف حساب
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <div id="certModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header no-print">
+                <h2><i class="fas fa-certificate"></i> پیش‌نمایش گواهی</h2>
+                <button class="modal-close" onclick="closeCertificateModal()">&times;</button>
+            </div>
+            <div id="certPreviewContainer" class="certificate-preview"></div>
+            <div class="cert-actions no-print">
+                <button class="btn btn-primary" onclick="printCertificate()">
+                    <i class="fas fa-print"></i> چاپ
+                </button>
+                <button class="btn btn-success" onclick="downloadCertificatePDF()">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <button class="btn btn-secondary" onclick="closeCertificateModal()">
+                    <i class="fas fa-times"></i> بستن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // CONFIGURATION
+        // ================================================================
+        const CONFIG = {
+            SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbz5WyHfsO3svJ-uXZAlxb_m2pww5CzoXOoPQR19zCePYGpXQ8w6b9nT4c9Edm9kVCs/exec',
+            MAX_PHOTO_SIZE: 2 * 1024 * 1024,
+            ALLOWED_PHOTO_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        };
+
+        // ================================================================
+        // STATE
+        // ================================================================
+        const state = {
+            student: null,
+            selectedCourse: null,
+            selectedCourseTitle: '',
+            photoDataURL: null,
+            courses: [],
+            isEditMode: false,
+            theme: 'light',
+            registeredCourses: []
+        };
+
+        // ================================================================
+        // DOM REFS
+        // ================================================================
+        const $ = (id) => document.getElementById(id);
+        const DOM = {
+            internetDot: $('internetDot'),
+            internetStatus: $('internetStatus'),
+            serverDot: $('serverDot'),
+            serverStatus: $('serverStatus'),
+            lastUpdateTime: $('lastUpdateTime'),
+            lastUpdateTimeDisplay: $('lastUpdateTimeDisplay'),
+            message: $('message'),
+            loading: $('loading'),
+            loginScreen: $('loginScreen'),
+            loginNationalId: $('loginNationalId'),
+            loginPassword: $('loginPassword'),
+            loginError: $('loginError'),
+            loginSuccess: $('loginSuccess'),
+            dashboard: $('dashboard'),
+            welcomeName: $('welcomeName'),
+            welcomeStatus: $('welcomeStatus'),
+            courseList: $('courseList'),
+            selectedCourseInfo: $('selectedCourseInfo'),
+            selectedCourseTitle: $('selectedCourseTitle'),
+            registeredCoursesContainer: $('registeredCoursesContainer'),
+            registeredCoursesList: $('registeredCoursesList'),
+            editMode: $('editMode'),
+            editNationalId: $('editNationalId'),
+            firstName: $('firstName'),
+            lastName: $('lastName'),
+            gender: $('gender'),
+            birthDate: $('birthDate'),
+            nationalId: $('nationalId'),
+            phone: $('phone'),
+            education: $('education'),
+            address: $('address'),
+            password: $('password'),
+            studentPhoto: $('studentPhoto'),
+            photoPreview: $('photoPreview'),
+            photoHint: $('photoHint'),
+            birthDateHint: $('birthDateHint'),
+            nationalIdHint: $('nationalIdHint'),
+            phoneHint: $('phoneHint'),
+            passwordHint: $('passwordHint'),
+            regStatus: $('regStatus'),
+            submitBtn: $('submitBtn'),
+            printBtn: $('printBtn'),
+            certModal: $('certModal'),
+            certPreviewContainer: $('certPreviewContainer')
+        };
+
+        // ================================================================
+        // UTILITY FUNCTIONS
+        // ================================================================
+
+        function toEnglishDigits(str) {
+            const map = {
+                '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+                '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+            };
+            return String(str || '').replace(/[۰-۹]/g, m => map[m] || m);
+        }
+
+        function isValidPersianDate(str) {
+            const match = String(str || '').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+            if (!match) return false;
+            const year = parseInt(match[1]);
+            const month = parseInt(match[2]);
+            const day = parseInt(match[3]);
+            if (year < 1300 || year > 1450) return false;
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+            const daysInMonth = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 29];
+            if (day > daysInMonth[month - 1]) {
+                if (month === 12 && day === 30) {
+                    const leapYears = [1, 5, 9, 13, 17, 21, 25, 29];
+                    return leapYears.includes(year % 33);
+                }
+                return false;
+            }
+            return true;
+        }
+
+        function formatPersianDate(str) {
+            const match = String(str || '').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+            if (!match) return str;
+            return `${match[1]}/${String(parseInt(match[2])).padStart(2, '0')}/${String(parseInt(match[3])).padStart(2, '0')}`;
+        }
+
+        function persianDateToText(str) {
+            const match = String(str || '').match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+            if (!match) return str;
+            const year = parseInt(match[1]);
+            const month = parseInt(match[2]);
+            const day = parseInt(match[3]);
+            const monthNames = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+                'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+            ];
+            return `${day} ${monthNames[month - 1]} سال ${year}`;
+        }
+
+        function generateTrackingCode(nationalId, courseCode) {
+            const ts = Date.now().toString().slice(-6);
+            return `${String(nationalId).slice(-4)}-${courseCode}-${ts}`;
+        }
+
+        function generateQRUrl(data) {
+            return `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data)}`;
+        }
+
+        function showMessage(text, type = 'info') {
+            const el = DOM.message;
+            el.textContent = text;
+            el.className = `message show ${type}`;
+            clearTimeout(el._timeout);
+            el._timeout = setTimeout(() => {
+                el.className = 'message';
+            }, 8000);
+        }
+
+        function setLoading(show) {
+            DOM.loading.classList.toggle('show', show);
+        }
+
+        function getFormData() {
+            return {
+                firstName: DOM.firstName.value.trim(),
+                lastName: DOM.lastName.value.trim(),
+                gender: DOM.gender.value,
+                birthDate: DOM.birthDate.value.trim(),
+                nationalId: toEnglishDigits(DOM.nationalId.value.trim()),
+                phone: toEnglishDigits(DOM.phone.value.trim()),
+                education: DOM.education.value,
+                address: DOM.address.value.trim(),
+                password: DOM.password.value.trim(),
+                photo: state.photoDataURL
+            };
+        }
+
+        function getFieldLabel(field) {
+            const labels = {
+                firstName: 'نام',
+                lastName: 'نام خانوادگی',
+                gender: 'جنسیت',
+                birthDate: 'تاریخ تولد',
+                nationalId: 'کد ملی',
+                phone: 'شماره موبایل',
+                education: 'مدرک تحصیلی',
+                address: 'آدرس'
+            };
+            return labels[field] || field;
+        }
+
+        function getCourseTitle(courseCode) {
+            if (!courseCode) return 'نامشخص';
+            const course = state.courses.find(c => c.code === courseCode);
+            return course ? course.title || courseCode : courseCode;
+        }
+
+        // ================================================================
+        // THEME
+        // ================================================================
+
+        function toggleTheme() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+                const icon = document.querySelector('.theme-toggle i');
+                icon.className = saved === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        // ================================================================
+        // STATUS
+        // ================================================================
+
+        function checkInternetStatus() {
+            const dot = DOM.internetDot;
+            const text = DOM.internetStatus;
+            if (navigator.onLine) {
+                dot.className = 'status-dot online';
+                text.className = 'status-text online';
+                text.textContent = '✅ متصل';
+            } else {
+                dot.className = 'status-dot offline';
+                text.className = 'status-text offline';
+                text.textContent = '❌ قطع';
+            }
+        }
+
+        function checkServerStatus() {
+            const dot = DOM.serverDot;
+            const text = DOM.serverStatus;
+            dot.className = 'status-dot checking';
+            text.className = 'status-text checking';
+            text.textContent = 'در حال بررسی...';
+
+            fetch(`${CONFIG.SCRIPT_URL}?action=getCourses`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Server error');
+                    dot.className = 'status-dot online';
+                    text.className = 'status-text online';
+                    text.textContent = '✅ متصل';
+                    updateLastUpdateTime();
+                })
+                .catch(() => {
+                    dot.className = 'status-dot offline';
+                    text.className = 'status-text offline';
+                    text.textContent = '❌ قطع';
+                });
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            DOM.lastUpdateTime.textContent = `آخرین بروزرسانی: ${time}`;
+            DOM.lastUpdateTimeDisplay.textContent = time;
+        }
+
+        // ================================================================
+        // PHOTO
+        // ================================================================
+
+        function handlePhotoUpload(input) {
+            const file = input.files[0];
+            const preview = DOM.photoPreview;
+            const hint = DOM.photoHint;
+
+            if (!file) {
+                preview.className = 'photo-preview';
+                state.photoDataURL = null;
+                hint.className = 'hint';
+                hint.textContent = 'JPG, PNG (حداکثر ۲MB)';
+                return;
+            }
+
+            if (file.size > CONFIG.MAX_PHOTO_SIZE) {
+                hint.className = 'hint error';
+                hint.textContent = '❌ حجم بیشتر از ۲MB';
+                input.value = '';
+                preview.className = 'photo-preview';
+                state.photoDataURL = null;
+                return;
+            }
+
+            if (!CONFIG.ALLOWED_PHOTO_TYPES.includes(file.type)) {
+                hint.className = 'hint error';
+                hint.textContent = '❌ فرمت مجاز نیست';
+                input.value = '';
+                preview.className = 'photo-preview';
+                state.photoDataURL = null;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.className = 'photo-preview show';
+                state.photoDataURL = e.target.result;
+                hint.className = 'hint success';
+                hint.textContent = '✓ بارگذاری شد';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // ================================================================
+        // VALIDATION
+        // ================================================================
+
+        function validateBirthDate() {
+            const value = DOM.birthDate.value.trim();
+            const hint = DOM.birthDateHint;
+            if (!value) {
+                DOM.birthDate.className = '';
+                hint.className = 'hint';
+                hint.textContent = 'فرمت: سال/ماه/روز';
+                return false;
+            }
+            if (isValidPersianDate(value)) {
+                DOM.birthDate.className = 'valid';
+                hint.className = 'hint success';
+                hint.textContent = '✓ معتبر';
+                return true;
+            } else {
+                DOM.birthDate.className = 'invalid';
+                hint.className = 'hint error';
+                hint.textContent = '❌ نامعتبر';
+                return false;
+            }
+        }
+
+        function validatePhone() {
+            const value = toEnglishDigits(DOM.phone.value.trim());
+            const hint = DOM.phoneHint;
+            if (!value) {
+                DOM.phone.className = '';
+                hint.className = 'hint';
+                hint.textContent = 'شروع با ۰۹';
+                return false;
+            }
+            if (/^09\d{9}$/.test(value)) {
+                DOM.phone.className = 'valid';
+                hint.className = 'hint success';
+                hint.textContent = '✓ معتبر';
+                return true;
+            } else {
+                DOM.phone.className = 'invalid';
+                hint.className = 'hint error';
+                hint.textContent = '❌ نامعتبر';
+                return false;
+            }
+        }
+
+        function validateNationalId() {
+            const value = toEnglishDigits(DOM.nationalId.value.trim());
+            const hint = DOM.nationalIdHint;
+            if (!value) {
+                DOM.nationalId.className = '';
+                hint.className = 'hint';
+                hint.textContent = 'کد ملی ۱۰ رقم';
+                return false;
+            }
+            if (/^\d{10}$/.test(value)) {
+                DOM.nationalId.className = 'valid';
+                hint.className = 'hint success';
+                hint.textContent = '✓ معتبر';
+                return true;
+            } else {
+                DOM.nationalId.className = 'invalid';
+                hint.className = 'hint error';
+                hint.textContent = '❌ ۱۰ رقم';
+                return false;
+            }
+        }
+
+        function validatePassword() {
+            const value = DOM.password.value.trim();
+            const hint = DOM.passwordHint;
+            if (!value) {
+                DOM.password.className = '';
+                hint.className = 'hint';
+                hint.textContent = 'حداقل ۴ کاراکتر';
+                return true;
+            }
+            if (value.length >= 4) {
+                DOM.password.className = 'valid';
+                hint.className = 'hint success';
+                hint.textContent = '✓ معتبر';
+                return true;
+            } else {
+                DOM.password.className = 'invalid';
+                hint.className = 'hint error';
+                hint.textContent = '❌ حداقل ۴ کاراکتر';
+                return false;
+            }
+        }
+
+        function validateForm(data) {
+            const required = ['firstName', 'lastName', 'gender', 'birthDate', 'nationalId', 'phone', 'education', 'address'];
+            for (const field of required) {
+                if (!data[field]) {
+                    showMessage(`لطفاً ${getFieldLabel(field)} را پر کنید.`, 'error');
+                    return false;
+                }
+            }
+
+            if (!isValidPersianDate(data.birthDate)) {
+                showMessage('تاریخ تولد نامعتبر است.', 'error');
+                return false;
+            }
+
+            if (!/^\d{10}$/.test(data.nationalId)) {
+                showMessage('کد ملی باید ۱۰ رقم باشد.', 'error');
+                return false;
+            }
+
+            if (!/^09\d{9}$/.test(data.phone)) {
+                showMessage('شماره موبایل نامعتبر است.', 'error');
+                return false;
+            }
+
+            if (data.password && data.password.length < 4) {
+                showMessage('رمز عبور باید حداقل ۴ کاراکتر باشد.', 'error');
+                return false;
+            }
+
+            return true;
+        }
+
+        // ================================================================
+        // LOGIN
+        // ================================================================
+
+        function handleLogin() {
+            const nationalId = toEnglishDigits(DOM.loginNationalId.value.trim());
+            const password = DOM.loginPassword.value.trim();
+
+            DOM.loginError.className = 'login-error';
+            DOM.loginSuccess.className = 'login-success';
+
+            if (!nationalId || nationalId.length !== 10) {
+                DOM.loginError.textContent = '❌ کد ملی باید ۱۰ رقم باشد';
+                DOM.loginError.className = 'login-error show';
+                return;
+            }
+
+            if (!password || password.length < 4) {
+                DOM.loginError.textContent = '❌ رمز عبور باید حداقل ۴ کاراکتر باشد';
+                DOM.loginError.className = 'login-error show';
+                return;
+            }
+
+            setLoading(true);
+
+            fetch(CONFIG.SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'studentLogin',
+                        nationalId: nationalId,
+                        password: password
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    console.log('📥 Login Response:', data);
+
+                    if (data.status === 'success' && data.student) {
+                        const student = data.student;
+                        const realStatus = String(student.status || 'pending').trim().toLowerCase();
+
+                        let registeredCodes = [];
+                        if (student.courses && Array.isArray(student.courses)) {
+                            registeredCodes = student.courses;
+                        } else if (student.courseCode) {
+                            registeredCodes = [student.courseCode];
+                        }
+
+                        state.student = {
+                            nationalId: student.nationalId || nationalId,
+                            firstName: student.firstName || '',
+                            lastName: student.lastName || '',
+                            gender: student.gender || '',
+                            birthDate: student.birthDate || '',
+                            phone: student.phone || '',
+                            education: student.education || '',
+                            address: student.address || '',
+                            password: student.password || password,
+                            status: realStatus,
+                            courses: registeredCodes
+                        };
+
+                        state.registeredCourses = registeredCodes;
+
+                        DOM.loginSuccess.textContent = '✅ ' + (data.message || 'ورود موفق');
+                        DOM.loginSuccess.className = 'login-success show';
+                        DOM.loginError.className = 'login-error';
+
+                        setTimeout(() => {
+                            DOM.loginScreen.classList.add('hidden');
+                            DOM.dashboard.classList.add('active');
+                            loadStudentData(state.student);
+                            loadCourses();
+
+                            setTimeout(() => {
+                                DOM.loginSuccess.className = 'login-success';
+                            }, 3000);
+                        }, 500);
+
+                    } else {
+                        DOM.loginError.textContent = '❌ ' + (data.message || 'کد ملی یا رمز عبور اشتباه است');
+                        DOM.loginError.className = 'login-error show';
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    DOM.loginError.textContent = '❌ خطا: ' + err.message;
+                    DOM.loginError.className = 'login-error show';
+                    console.error('Login error:', err);
+                });
+        }
+
+        // ================================================================
+        // LOAD STUDENT DATA
+        // ================================================================
+
+        function loadStudentData(student) {
+            if (!student) {
+                showMessage('❌ اطلاعات دانشجو یافت نشد', 'error');
+                return;
+            }
+
+            const fullName = `${student.firstName || ''} ${student.lastName || ''}`.trim();
+            DOM.welcomeName.textContent = `👤 ${fullName || 'کاربر'}`;
+
+            const status = String(student.status || 'pending').trim().toLowerCase();
+            const statusEl = DOM.welcomeStatus;
+            const regStatusEl = DOM.regStatus;
+
+            statusEl.className = 'user-status';
+            regStatusEl.className = 'reg-status';
+            regStatusEl.style.display = 'none';
+
+            if (status === 'approved' || status === 'تایید شده' || status === 'تأیید شده') {
+                statusEl.className = 'user-status approved';
+                statusEl.textContent = '✅ تایید شده';
+                DOM.printBtn.disabled = false;
+                DOM.printBtn.style.opacity = '1';
+                DOM.printBtn.style.cursor = 'pointer';
+
+                regStatusEl.className = 'reg-status approved';
+                regStatusEl.textContent = '✅ ثبت‌نام شما تایید شده است.';
+                regStatusEl.style.display = 'block';
+
+            } else if (status === 'pending' || status === 'در انتظار تایید') {
+                statusEl.className = 'user-status pending';
+                statusEl.textContent = '⏳ در انتظار تایید';
+                DOM.printBtn.disabled = true;
+                DOM.printBtn.style.opacity = '0.5';
+                DOM.printBtn.style.cursor = 'not-allowed';
+
+                regStatusEl.className = 'reg-status pending';
+                regStatusEl.textContent = '⏳ در انتظار تایید مدیر.';
+                regStatusEl.style.display = 'block';
+
+            } else if (status === 'rejected' || status === 'رد شده') {
+                statusEl.className = 'user-status rejected';
+                statusEl.textContent = '❌ رد شده';
+                DOM.printBtn.disabled = true;
+                DOM.printBtn.style.opacity = '0.5';
+                DOM.printBtn.style.cursor = 'not-allowed';
+
+                regStatusEl.className = 'reg-status rejected';
+                regStatusEl.textContent = '❌ ثبت‌نام رد شده است.';
+                regStatusEl.style.display = 'block';
+
+            } else {
+                statusEl.className = 'user-status pending';
+                statusEl.textContent = `⏳ ${status || 'نامشخص'}`;
+                DOM.printBtn.disabled = true;
+                DOM.printBtn.style.opacity = '0.5';
+                DOM.printBtn.style.cursor = 'not-allowed';
+
+                regStatusEl.className = 'reg-status pending';
+                regStatusEl.textContent = `⏳ وضعیت: ${status || 'نامشخص'}`;
+                regStatusEl.style.display = 'block';
+            }
+
+            DOM.firstName.value = student.firstName || '';
+            DOM.lastName.value = student.lastName || '';
+            DOM.gender.value = student.gender || '';
+            DOM.birthDate.value = student.birthDate || '';
+            DOM.nationalId.value = student.nationalId || '';
+            DOM.phone.value = student.phone || '';
+            DOM.education.value = student.education || '';
+            DOM.address.value = student.address || '';
+            DOM.password.value = student.password || '';
+
+            state.isEditMode = true;
+            DOM.editMode.value = 'true';
+            DOM.editNationalId.value = student.nationalId || '';
+            DOM.submitBtn.textContent = '💾 ذخیره تغییرات';
+            DOM.nationalId.readOnly = true;
+            DOM.nationalId.style.background = 'var(--gray-100)';
+
+            renderRegisteredCourses();
+
+            if (state.registeredCourses.length > 0) {
+                selectCourse(state.registeredCourses[0]);
+            }
+
+            showMessage(`✅ خوش آمدید ${fullName || 'کاربر'}`, 'success');
+        }
+
+        // ================================================================
+        // REGISTERED COURSES RENDER
+        // ================================================================
+
+        function renderRegisteredCourses() {
+            const container = DOM.registeredCoursesContainer;
+            const list = DOM.registeredCoursesList;
+
+            if (!state.registeredCourses || state.registeredCourses.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            let html = '';
+            state.registeredCourses.forEach(code => {
+                const title = getCourseTitle(code);
+                html += `
+                        <span class="registered-course-chip">
+                            <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                            ${title} (${code})
+                            <button class="remove-btn" onclick="removeRegisteredCourse('${code}')" title="لغو ثبت‌نام از این دوره">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </span>
+                    `;
+            });
+            list.innerHTML = html;
+        }
+
+        // ================================================================
+        // REGISTER FOR COURSE
+        // ================================================================
+
+        function registerForCourse(courseCode) {
+            if (!state.student) {
+                showMessage('❌ ابتدا وارد شوید.', 'error');
+                return;
+            }
+
+            if (state.registeredCourses.includes(courseCode)) {
+                showMessage('⚠️ شما قبلاً در این دوره ثبت‌نام کرده‌اید.', 'warning');
+                return;
+            }
+
+            if (!confirm(`آیا مایل به ثبت‌نام در دوره "${getCourseTitle(courseCode)}" هستید؟`)) {
+                return;
+            }
+
+            setLoading(true);
+
+            let password = prompt('لطفاً رمز عبور خود را برای تأیید ثبت‌نام وارد کنید:');
+            if (!password || password.trim() === '') {
+                setLoading(false);
+                showMessage('❌ رمز عبور الزامی است.', 'error');
+                return;
+            }
+            password = password.trim();
+
+            console.log('🔑 ارسال رمز عبور برای ثبت‌نام در دوره:', courseCode);
+            console.log('📋 کد ملی:', state.student.nationalId);
+
+            fetch(CONFIG.SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'registerForCourse',
+                        nationalId: state.student.nationalId,
+                        courseCode: courseCode,
+                        password: password,
+                        firstName: state.student.firstName || '',
+                        lastName: state.student.lastName || ''
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(result => {
+                    setLoading(false);
+                    console.log('📥 Register Course Result:', result);
+
+                    if (result.status === 'success') {
+                        if (!state.registeredCourses.includes(courseCode)) {
+                            state.registeredCourses.push(courseCode);
+                            state.student.courses = state.registeredCourses;
+                        }
+                        renderRegisteredCourses();
+                        renderCourses(state.courses);
+                        selectCourse(courseCode);
+                        showMessage('✅ ثبت‌نام در دوره با موفقیت انجام شد.', 'success');
+                    } else {
+                        showMessage('❌ ' + (result.message || 'خطا در ثبت‌نام'), 'error');
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    showMessage('❌ خطا: ' + err.message, 'error');
+                    console.error('Register course error:', err);
+                });
+        }
+
+        // ================================================================
+        // REMOVE REGISTERED COURSE
+        // ================================================================
+
+        function removeRegisteredCourse(courseCode) {
+            if (!state.student) {
+                showMessage('❌ وارد نشده‌اید.', 'error');
+                return;
+            }
+
+            if (!confirm(`آیا از لغو ثبت‌نام از دوره "${getCourseTitle(courseCode)}" اطمینان دارید؟`)) {
+                return;
+            }
+
+            setLoading(true);
+
+            let password = prompt('لطفاً رمز عبور خود را برای تأیید لغو ثبت‌نام وارد کنید:');
+            if (!password || password.trim() === '') {
+                setLoading(false);
+                showMessage('❌ رمز عبور الزامی است.', 'error');
+                return;
+            }
+            password = password.trim();
+
+            fetch(CONFIG.SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'removeStudentCourse',
+                        nationalId: state.student.nationalId,
+                        courseCode: courseCode,
+                        password: password
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(result => {
+                    setLoading(false);
+                    console.log('📥 Remove Course Result:', result);
+
+                    if (result.status === 'success') {
+                        state.registeredCourses = state.registeredCourses.filter(c => c !== courseCode);
+                        state.student.courses = state.registeredCourses;
+                        renderRegisteredCourses();
+                        renderCourses(state.courses);
+
+                        if (state.selectedCourse === courseCode) {
+                            if (state.registeredCourses.length > 0) {
+                                selectCourse(state.registeredCourses[0]);
+                            } else {
+                                state.selectedCourse = null;
+                                state.selectedCourseTitle = '';
+                                DOM.selectedCourseInfo.classList.remove('show');
+                                DOM.printBtn.disabled = true;
+                            }
+                        }
+
+                        showMessage('✅ لغو ثبت‌نام با موفقیت انجام شد.', 'success');
+                    } else {
+                        showMessage('❌ ' + (result.message || 'خطا در لغو ثبت‌نام'), 'error');
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    showMessage('❌ خطا: ' + err.message, 'error');
+                    console.error('Remove course error:', err);
+                });
+        }
+
+        // ================================================================
+        // LOGOUT
+        // ================================================================
+
+        function handleLogout() {
+            if (confirm('آیا از خروج اطمینان دارید؟')) {
+                state.student = null;
+                state.selectedCourse = null;
+                state.photoDataURL = null;
+                state.registeredCourses = [];
+                DOM.dashboard.classList.remove('active');
+                DOM.loginScreen.classList.remove('hidden');
+                DOM.loginPassword.value = '';
+                DOM.loginNationalId.value = '';
+                DOM.loginError.className = 'login-error';
+                DOM.loginSuccess.className = 'login-success';
+                resetForm();
+                showMessage('👋 شما خارج شدید.', 'info');
+            }
+        }
+
+        // ================================================================
+        // COURSES
+        // ================================================================
+
+        function loadCourses() {
+            setLoading(true);
+            fetch(`${CONFIG.SCRIPT_URL}?action=getCourses`)
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(data => {
+                    setLoading(false);
+                    if (data.status === 'success') {
+                        state.courses = data.courses || data.data || [];
+                        renderCourses(state.courses);
+                    } else {
+                        showMessage('خطا در بارگذاری دوره‌ها: ' + (data.message || 'خطای ناشناخته'), 'error');
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    showMessage('❌ خطا: ' + err.message, 'error');
+                    console.error('Courses error:', err);
+                });
+        }
+
+        function renderCourses(courses) {
+            if (!courses || courses.length === 0) {
+                DOM.courseList.innerHTML = '<p style="color:var(--text-secondary); text-align:center;">هیچ دوره‌ای وجود ندارد.</p>';
+                return;
+            }
+
+            let html = '';
+            const registeredCodes = state.registeredCourses || [];
+
+            courses.forEach(course => {
+                const statusClass = {
+                    'در حال اجرا': 'badge-running',
+                    'در شرف شروع': 'badge-upcoming',
+                    'خاتمه یافته': 'badge-finished'
+                } [course.status] || 'badge-finished';
+
+                const code = course.code || course.title || '';
+                const isRegistered = registeredCodes.includes(code);
+                const isSelected = (state.selectedCourse === code) ? 'selected' : '';
+
+                let onclickAction;
+                if (isRegistered) {
+                    onclickAction = `selectCourse('${code}')`;
+                } else {
+                    onclickAction = `registerForCourse('${code}')`;
+                }
+
+                const participants = course.participants || 0;
+
+                html += `
+                        <div class="course-item ${isSelected}" data-code="${code}" onclick="${onclickAction}">
+                            <div class="course-info">
+                                <div>
+                                    <span class="course-title">${course.title || 'بدون عنوان'}</span>
+                                    <span class="badge ${statusClass}">${course.status || 'نامشخص'}</span>
+                                    ${isRegistered ? '<span class="badge badge-registered">✓ ثبت‌نام شده</span>' : ''}
+                                </div>
+                                <div class="course-meta">
+                                    <span><i class="fas fa-building"></i> ${course.institute || 'نامشخص'}</span>
+                                    <span><i class="fas fa-chalkboard-teacher"></i> ${course.instructor || 'نامشخص'}</span>
+                                    <span><i class="fas fa-calendar-alt"></i> ${formatPersianDate(course.startDate) || ''} - ${formatPersianDate(course.endDate) || ''}</span>
+                                    <span><i class="fas fa-users"></i> ${participants} نفر</span>
+                                    ${!isRegistered ? '<span style="color:var(--primary);"><i class="fas fa-plus-circle"></i> ثبت‌نام</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            });
+
+            DOM.courseList.innerHTML = html;
+        }
+
+        // ================================================================
+        // SELECT COURSE
+        // ================================================================
+
+        function selectCourse(courseCode) {
+            if (!state.registeredCourses.includes(courseCode)) {
+                showMessage('⚠️ شما در این دوره ثبت‌نام نکرده‌اید.', 'warning');
+                return;
+            }
+
+            const items = DOM.courseList.querySelectorAll('.course-item');
+            let title = '';
+
+            items.forEach(item => {
+                item.classList.remove('selected');
+                if (item.dataset.code === courseCode) {
+                    item.classList.add('selected');
+                    const titleEl = item.querySelector('.course-title');
+                    if (titleEl) title = titleEl.textContent || '';
+                }
+            });
+
+            state.selectedCourse = courseCode;
+            state.selectedCourseTitle = title;
+
+            DOM.selectedCourseTitle.textContent = `${title} (${courseCode})`;
+            DOM.selectedCourseInfo.classList.add('show');
+
+            const status = String(state.student?.status || 'pending').trim().toLowerCase();
+            if (status === 'approved' || status === 'تایید شده' || status === 'تأیید شده') {
+                DOM.printBtn.disabled = false;
+                DOM.printBtn.style.opacity = '1';
+                DOM.printBtn.style.cursor = 'pointer';
+            }
+        }
+
+        // ================================================================
+        // SHOW REGISTRATION FORM
+        // ================================================================
+
+        function showRegistrationForm() {
+            DOM.loginScreen.classList.add('hidden');
+            DOM.dashboard.classList.add('active');
+            resetForm();
+
+            state.isEditMode = false;
+            DOM.editMode.value = 'false';
+            DOM.submitBtn.textContent = '📝 ثبت نام در دوره';
+            DOM.nationalId.readOnly = false;
+            DOM.nationalId.style.background = 'white';
+            DOM.nationalId.value = '';
+            DOM.password.value = '';
+            DOM.printBtn.disabled = true;
+
+            DOM.selectedCourseInfo.classList.remove('show');
+            state.selectedCourse = null;
+            state.selectedCourseTitle = '';
+            state.registeredCourses = [];
+
+            DOM.loginError.className = 'login-error';
+            DOM.loginSuccess.className = 'login-success';
+            DOM.registeredCoursesContainer.style.display = 'none';
+
+            showMessage('📝 اطلاعات خود را وارد کنید.', 'info');
+
+            setTimeout(() => {
+                document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        }
+
+        // ================================================================
+        // RESET FORM
+        // ================================================================
+
+        function resetForm() {
+            DOM.firstName.value = '';
+            DOM.lastName.value = '';
+            DOM.gender.value = '';
+            DOM.birthDate.value = '';
+            DOM.nationalId.value = '';
+            DOM.phone.value = '';
+            DOM.education.value = '';
+            DOM.address.value = '';
+            DOM.password.value = '';
+            DOM.studentPhoto.value = '';
+            DOM.photoPreview.className = 'photo-preview';
+            state.photoDataURL = null;
+
+            DOM.birthDate.className = '';
+            DOM.phone.className = '';
+            DOM.nationalId.className = '';
+            DOM.password.className = '';
+
+            DOM.birthDateHint.className = 'hint';
+            DOM.birthDateHint.textContent = 'فرمت: سال/ماه/روز';
+            DOM.phoneHint.className = 'hint';
+            DOM.phoneHint.textContent = 'شروع با ۰۹';
+            DOM.nationalIdHint.className = 'hint';
+            DOM.nationalIdHint.textContent = 'کد ملی ۱۰ رقم';
+            DOM.passwordHint.className = 'hint';
+            DOM.passwordHint.textContent = 'حداقل ۴ کاراکتر';
+            DOM.photoHint.className = 'hint';
+            DOM.photoHint.textContent = 'JPG, PNG (حداکثر ۲MB)';
+
+            DOM.regStatus.className = 'reg-status';
+            DOM.regStatus.style.display = 'none';
+
+            DOM.selectedCourseInfo.classList.remove('show');
+            state.selectedCourse = null;
+            state.selectedCourseTitle = '';
+
+            DOM.courseList.querySelectorAll('.course-item').forEach(el => el.classList.remove('selected'));
+            DOM.registeredCoursesContainer.style.display = 'none';
+        }
+
+        // ================================================================
+        // SUBMIT
+        // ================================================================
+
+        function handleSubmit() {
+            const data = getFormData();
+
+            if (!validateForm(data)) return;
+
+            setLoading(true);
+
+            const params = {
+                action: state.isEditMode ? 'updateStudentWithAuth' : 'register',
+                ...data
+            };
+
+            if (state.isEditMode) {
+                params.oldNationalId = DOM.editNationalId.value;
+            }
+
+            if (state.registeredCourses.length > 0) {
+                params.courses = JSON.stringify(state.registeredCourses);
+            }
+
+            fetch(CONFIG.SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(params)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(result => {
+                    setLoading(false);
+                    console.log('📥 Submit Result:', result);
+
+                    if (result.status === 'success') {
+                        if (state.isEditMode) {
+                            showMessage('✅ اطلاعات ویرایش شد!', 'success');
+                            if (state.student) {
+                                state.student.firstName = data.firstName;
+                                state.student.lastName = data.lastName;
+                                state.student.gender = data.gender;
+                                state.student.birthDate = data.birthDate;
+                                state.student.phone = data.phone;
+                                state.student.education = data.education;
+                                state.student.address = data.address;
+                                state.student.password = data.password;
+                                DOM.welcomeName.textContent = `👤 ${data.firstName} ${data.lastName}`;
+                            }
+                        } else {
+                            showMessage('✅ ثبت‌نام انجام شد! در انتظار تایید.', 'success');
+                            if (data.nationalId && data.password) {
+                                DOM.loginNationalId.value = data.nationalId;
+                                DOM.loginPassword.value = data.password;
+                                setTimeout(() => handleLogin(), 1500);
+                            }
+                        }
+                        loadCourses();
+                    } else {
+                        showMessage('❌ ' + (result.message || 'خطا در ثبت‌نام'), 'error');
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    showMessage('❌ خطا: ' + err.message, 'error');
+                    console.error('Submit error:', err);
+                });
+        }
+
+        // ================================================================
+        // DELETE ACCOUNT
+        // ================================================================
+
+        function handleDeleteAccount() {
+            if (!state.student) {
+                showMessage('❌ وارد نشده‌اید.', 'error');
+                return;
+            }
+
+            if (!confirm(`⚠️ حذف حساب؟\nکد ملی: ${state.student.nationalId}\nغیرقابل بازگشت!`)) {
+                return;
+            }
+
+            const password = prompt('برای تأیید، رمز عبور را وارد کنید:');
+            if (!password) {
+                showMessage('❌ رمز عبور الزامی است.', 'error');
+                return;
+            }
+
+            setLoading(true);
+
+            fetch(CONFIG.SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        action: 'deleteStudentWithAuth',
+                        nationalId: state.student.nationalId,
+                        password: password
+                    })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(result => {
+                    setLoading(false);
+                    if (result.status === 'success') {
+                        showMessage('✅ حساب حذف شد.', 'success');
+                        handleLogout();
+                    } else {
+                        showMessage('❌ ' + (result.message || 'خطا در حذف'), 'error');
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    showMessage('❌ خطا: ' + err.message, 'error');
+                    console.error('Delete error:', err);
+                });
+        }
+
+        // ================================================================
+        // CERTIFICATE
+        // ================================================================
+
+        function handlePrintCertificate() {
+            if (!state.student) {
+                showMessage('❌ وارد نشده‌اید.', 'error');
+                return;
+            }
+
+            if (!state.registeredCourses || state.registeredCourses.length === 0) {
+                showMessage('⚠️ شما در هیچ دوره‌ای ثبت‌نام نکرده‌اید.', 'warning');
+                return;
+            }
+
+            if (!state.selectedCourse || !state.registeredCourses.includes(state.selectedCourse)) {
+                selectCourse(state.registeredCourses[0]);
+                if (!state.selectedCourse) {
+                    showMessage('⚠️ لطفاً یک دوره را انتخاب کنید.', 'warning');
+                    return;
+                }
+            }
+
+            const status = String(state.student.status || 'pending').trim().toLowerCase();
+
+            if (status !== 'approved' && status !== 'تایید شده' && status !== 'تأیید شده') {
+                if (status === 'pending' || status === 'در انتظار تایید') {
+                    showMessage('⏳ در انتظار تایید مدیر.', 'warning');
+                } else if (status === 'rejected' || status === 'رد شده') {
+                    showMessage('❌ ثبت‌نام رد شده است.', 'error');
+                } else {
+                    showMessage('⚠️ وضعیت نامشخص.', 'warning');
+                }
+                return;
+            }
+
+            generateCertificate(state.selectedCourse);
+        }
+
+        // ================================================================
+        // GENERATE CERTIFICATE
+        // ================================================================
+
+        function generateCertificate(courseCode) {
+            if (!courseCode || !state.registeredCourses.includes(courseCode)) {
+                showMessage('⚠️ دوره نامعتبر.', 'warning');
+                return;
+            }
+
+            const studentData = {
+                nationalId: state.student.nationalId,
+                firstName: state.student.firstName,
+                lastName: state.student.lastName,
+                gender: state.student.gender || '',
+                birthDate: state.student.birthDate || '',
+                education: state.student.education || '',
+                phone: state.student.phone || '',
+                address: state.student.address || '',
+                photo: state.photoDataURL || null
+            };
+
+            setLoading(true);
+
+            fetch(`${CONFIG.SCRIPT_URL}?action=getCourseInfo&courseCode=${encodeURIComponent(courseCode)}`)
+                .then(res => {
+                    if (!res.ok) throw new Error('خطا در ارتباط با سرور');
+                    return res.json();
+                })
+                .then(courseData => {
+                    setLoading(false);
+                    console.log('📥 Course Info:', courseData);
+
+                    if (courseData.status === 'success' && courseData.course) {
+                        renderCertificate(studentData, courseData.course);
+                    } else {
+                        const fallback = getFallbackCourse(courseCode);
+                        renderCertificate(studentData, fallback);
+                        showMessage('⚠️ اطلاعات دوره از سرور دریافت نشد.', 'warning');
+                    }
+                })
+                .catch(err => {
+                    setLoading(false);
+                    console.error('Certificate error:', err);
+                    const fallback = getFallbackCourse(courseCode);
+                    renderCertificate(studentData, fallback);
+                    showMessage('⚠️ خطا در دریافت اطلاعات دوره.', 'warning');
+                });
+        }
+
+        function getFallbackCourse(courseCode) {
+            const existingCourse = state.courses.find(c => c.code === courseCode);
+            if (existingCourse) {
+                return {
+                    ...existingCourse,
+                    duration: existingCourse.duration || '8',
+                    location: existingCourse.location || 'نامشخص'
+                };
+            }
+            return {
+                title: state.selectedCourseTitle || 'دوره آموزشی',
+                duration: '8',
+                institute: 'آموزشگاه',
+                instructor: 'نامشخص',
+                startDate: '1403/03/11',
+                endDate: '1403/03/18',
+                location: 'نامشخص',
+                status: 'در شرف شروع',
+                code: courseCode
+            };
+        }
+
+        // ================================================================
+        // RENDER CERTIFICATE
+        // ================================================================
+
+        function renderCertificate(data, course) {
+            const now = new Date();
+            const jYear = now.getFullYear() - 621;
+            const jMonth = now.getMonth() + 1;
+            const jDay = now.getDate();
+
+            const monthNames = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+                'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'
+            ];
+
+            let issueMonth = jMonth;
+            let issueYear = jYear;
+            let issueDay = jDay;
+
+            if (jMonth > 12) {
+                issueMonth = jMonth - 12;
+                issueYear += 1;
+            }
+
+            const issueDate = `${issueDay} ${monthNames[issueMonth - 1]} ${issueYear}`;
+            const startDateText = persianDateToText(course.startDate);
+            const endDateText = persianDateToText(course.endDate);
+            const birthDateText = persianDateToText(data.birthDate);
+
+            const genderTitle = data.gender === 'مرد' ? 'آقای ' : data.gender === 'زن' ? 'خانم ' : '';
+            const trackingCode = generateTrackingCode(data.nationalId, course.code || state.selectedCourse);
+            const qrData =
+                `گواهی دوره: ${course.title}\nکد رهگیری: ${trackingCode}\nکد ملی: ${data.nationalId}\nتاریخ صدور: ${issueDate}`;
+            const qrUrl = generateQRUrl(qrData);
+
+            const container = DOM.certPreviewContainer;
+            container.innerHTML = `
+                    <div class="cert-header">
+                        <img src="images/logo.png" alt="لوگو" class="logo" onerror="this.style.display='none'">
+                        ${data.photo ? `<img src="${data.photo}" alt="تصویر" class="student-photo" onerror="this.style.display='none'">` : ''}
+                        <h2>🎓 گواهی قبولی</h2>
+                        <p style="font-size:14px; color:var(--text-secondary);">بسم الله الرحمن الرحیم</p>
+                        <p style="font-size:13px; color:var(--text-secondary);">شماره: ${trackingCode}</p>
+                    </div>
+                    <div class="cert-body">
+                        <p style="text-align:center; font-size:18px; font-weight:bold;">گواهی می‌شود که</p>
+                        <div class="student-name">${genderTitle}${data.firstName} ${data.lastName}</div>
+                        <p class="cert-detail" style="color:var(--text-secondary);">کد ملی: ${data.nationalId}</p>
+                        <p class="cert-detail" style="font-size:18px; margin-top:12px;">
+                            دوره <strong style="color:var(--primary);">«${course.title}»</strong> را
+                        </p>
+                        <p class="cert-detail">به مدت <strong>${course.duration} ساعت</strong></p>
+                        <p class="cert-detail">در <strong>${course.institute || 'نامشخص'}</strong> با تدریس <strong>${course.instructor || 'نامشخص'}</strong></p>
+                        <p class="cert-detail">از ${startDateText} تا ${endDateText}</p>
+                        <p class="cert-detail">در ${course.location || 'نامشخص'} با موفقیت گذرانده است.</p>
+
+                        <div style="margin:12px 0; text-align:center; padding:8px; background:var(--primary-light); border-radius:var(--radius);">
+                            <strong>وضعیت:</strong> ${course.status} ${course.code ? ` | <strong>کد:</strong> ${course.code}` : ''}
+                        </div>
+
+                        <div style="text-align:center; font-size:14px; color:var(--text-secondary);">
+                            <strong>مدرک:</strong> ${data.education} | <strong>تولد:</strong> ${birthDateText}
+                        </div>
+
+                        <div class="qr-section">
+                            <img src="${qrUrl}" alt="QR" onerror="this.style.display='none'">
+                            <div class="tracking-code">کد رهگیری: ${trackingCode}</div>
+                            <div style="font-size:12px; color:var(--text-secondary);">برای استعلام، کد را وارد کنید</div>
+                        </div>
+                    </div>
+                    <div class="cert-footer">
+                        <p style="font-size:14px; color:var(--text-secondary);">تاریخ صدور: ${issueDate}</p>
+                        <div class="signatures">
+                            <div class="sig-item">
+                                <img src="images/signature-manager.png" alt="امضاء" class="sig-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                                <div class="sig-line"></div>
+                                <span style="font-size:14px;">امضاء مدیر</span>
+                            </div>
+                            <div class="sig-item">
+                                <img src="images/signature-teacher.png" alt="امضاء" class="sig-img" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                                <div class="sig-line"></div>
+                                <span style="font-size:14px;">امضاء مدرس</span>
+                            </div>
+                            <div class="sig-item">
+                                <img src="images/stamp.png" alt="مهر" class="stamp-img" onerror="this.style.display='none'">
+                                <span style="font-size:14px;">مهر آموزشگاه</span>
+                            </div>
+                        </div>
+                        <p style="font-size:12px; color:var(--text-secondary); margin-top:12px;">
+                            این گواهی الکترونیکی است. برای استعلام، کد رهگیری را وارد کنید.
+                        </p>
+                    </div>
+                `;
+
+            DOM.certModal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ================================================================
+        // CERTIFICATE MODAL CONTROLS
+        // ================================================================
+
+        function closeCertificateModal() {
+            DOM.certModal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function printCertificate() {
+            const content = DOM.certPreviewContainer.innerHTML;
+            const win = window.open('', '_blank', 'width=800,height=600');
+            win.document.write(`
+                    <html dir="rtl">
+                    <head>
+                        <title>گواهی قبولی</title>
+                        <style>
+                            * { margin:0; padding:0; box-sizing:border-box; }
+                            body { font-family: 'Vazir','Tahoma','Arial',sans-serif; direction:rtl; padding:20px; background:white; display:flex; justify-content:center; align-items:center; min-height:100vh; }
+                            .cert { max-width:750px; width:100%; background:white; border:4px solid #0f172a; padding:35px; border-radius:15px; }
+                            .cert-header { text-align:center; border-bottom:3px solid #0f172a; padding-bottom:15px; margin-bottom:20px; }
+                            .cert-header .logo { max-width:80px; max-height:80px; margin-bottom:8px; }
+                            .cert-header .student-photo { width:100px; height:100px; border-radius:50%; object-fit:cover; border:3px solid #1a56db; margin-bottom:8px; }
+                            .cert-header h2 { color:#0f172a; font-size:26px; }
+                            .cert-body { line-height:2.2; font-size:16px; }
+                            .cert-body .student-name { font-size:24px; font-weight:bold; color:#1a56db; text-align:center; margin:12px 0; }
+                            .cert-body .cert-detail { text-align:center; margin:4px 0; }
+                            .cert-body .qr-section { text-align:center; margin:12px 0; }
+                            .cert-body .qr-section img { max-width:120px; max-height:120px; border:1px solid #e2e8f0; border-radius:8px; padding:6px; }
+                            .cert-body .tracking-code { font-size:14px; color:#475569; text-align:center; font-weight:bold; margin-top:4px; }
+                            .cert-footer { margin-top:24px; text-align:center; border-top:3px solid #0f172a; padding-top:20px; }
+                            .cert-footer .signatures { display:flex; justify-content:space-around; margin-top:16px; flex-wrap:wrap; gap:20px; }
+                            .cert-footer .signatures .sig-item { text-align:center; min-width:100px; }
+                            .cert-footer .signatures .sig-line { border-top:2px solid #0f172a; width:130px; margin:6px auto; }
+                            .cert-footer .signatures .sig-img { max-width:120px; max-height:60px; display:block; margin:0 auto 4px; }
+                            .cert-footer .stamp-img { max-width:80px; max-height:80px; display:block; margin:0 auto 8px; }
+                            @media print { body { padding:0; margin:0; } .cert { box-shadow:none; border-color:#000; border-radius:0; padding:30px; max-width:100%; min-height:100vh; } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="cert">${content}</div>
+                        <script>
+                            window.onload = function() { setTimeout(window.print, 600); }
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+            win.document.close();
+        }
+
+        function downloadCertificatePDF() {
+            printCertificate();
+        }
+
+        // ================================================================
+        // EVENT LISTENERS & INIT
+        // ================================================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            checkInternetStatus();
+            checkServerStatus();
+            loadCourses();
+
+            DOM.loginScreen.classList.remove('hidden');
+            DOM.dashboard.classList.remove('active');
+
+            DOM.birthDate.addEventListener('input', validateBirthDate);
+            DOM.birthDate.addEventListener('blur', validateBirthDate);
+            DOM.phone.addEventListener('input', validatePhone);
+            DOM.phone.addEventListener('blur', validatePhone);
+            DOM.nationalId.addEventListener('input', validateNationalId);
+            DOM.nationalId.addEventListener('blur', validateNationalId);
+            DOM.password.addEventListener('input', validatePassword);
+            DOM.password.addEventListener('blur', validatePassword);
+
+            DOM.loginNationalId.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') DOM.loginPassword.focus();
+            });
+
+            DOM.loginPassword.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            window.addEventListener('online', function() {
+                checkInternetStatus();
+                checkServerStatus();
+            });
+
+            window.addEventListener('offline', function() {
+                checkInternetStatus();
+            });
+
+            DOM.certModal.addEventListener('click', function(e) {
+                if (e.target === this) closeCertificateModal();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeCertificateModal();
+            });
+
+            showMessage('👋 لطفاً وارد شوید.', 'info');
+        });
+    </script>
+
+</body>
+</html>
